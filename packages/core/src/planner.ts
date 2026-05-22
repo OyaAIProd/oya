@@ -202,9 +202,9 @@ export class Planner {
       const user = `Mission: "${mission}"\nEmit the Plan IR as a single JSON object.`;
       const raw = await this.ask(system, user);
       const plan = this.materialise(raw, mission);
-      const chk = check(plan);
-      if (chk.ok) return plan;
-      priorErrors = chk.errors.map((e) => `${e.code}: ${e.message}`);
+      const fatal = fatalErrors(check(plan));
+      if (fatal.length === 0) return plan;
+      priorErrors = fatal.map((e) => `${e.code}: ${e.message}`);
       result.emitRetries = attempt + 1;
     }
     throw new Error(`plan failed static checks after retries: ${JSON.stringify(priorErrors)}`);
@@ -228,9 +228,9 @@ export class Planner {
       `Projected state so far: ${JSON.stringify(projected)}`;
     const raw = await this.ask(system, user);
     const next = this.materialise(raw, mission);
-    const chk = check(next);
-    if (!chk.ok) {
-      throw new Error(`replan failed static checks: ${JSON.stringify(chk.codes())}`);
+    const fatal = fatalErrors(check(next));
+    if (fatal.length) {
+      throw new Error(`replan failed static checks: ${JSON.stringify(fatal.map((e) => e.code))}`);
     }
     return next;
   }
@@ -275,6 +275,16 @@ export class Planner {
 
 function errMessage(exc: unknown): string {
   return exc instanceof Error ? exc.message : String(exc);
+}
+
+/**
+ * Check codes that are advisory, not safety/correctness — a real model often
+ * produces a plan with a stray unconsumed handle on a complex mission. Those are
+ * wasteful, not invalid, so the runtime runs the plan anyway rather than failing.
+ */
+const WARNING_CODES = new Set(["handle_unconsumed"]);
+function fatalErrors(res: { errors: { code: string; message: string }[] }) {
+  return res.errors.filter((e) => !WARNING_CODES.has(e.code));
 }
 
 function planningSystem(

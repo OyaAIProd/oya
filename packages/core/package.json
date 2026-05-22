@@ -24,7 +24,8 @@
     "build": "tsup",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
-    "example": "bun examples/weather-report.ts"
+    "example": "bun examples/weather-report.ts",
+    "demo": "bun examples/demo.ts"
   },
   "keywords": ["llm", "agents", "ai", "agent-framework", "plan-ir", "projection-types", "anthropic", "openai"],
   "dependencies": { "zod": "^3.23.8" },

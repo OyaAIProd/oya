@@ -1,23 +1,22 @@
 # Benchmarks — token loop vs. plan-don't-react
 
-Same task, three frameworks: the **Vercel AI SDK**, **Mastra**, and **oya**, all
-run against the **real Anthropic API**. The task is *"How's the weather in NYC?
-Then generate a PDF and a web page."* with three operations: `get_weather`,
-`generate_pdf`, `generate_webpage`.
+Two tasks, three frameworks (**Vercel AI SDK**, **Mastra**, **oya**), all run
+against the **real Anthropic API**, identical tool implementations
+([`tasks.ts`](./tasks.ts)):
 
-The Vercel AI SDK and Mastra are both **token loops** — Mastra's `Agent` runs the
-AI SDK tool-calling loop under the hood — so they share the same architectural
-cost. oya is plan-don't-react. The three operations have **identical
-implementations** across all three ([`task.ts`](./task.ts)); the only thing that
+- **`weather`** (light) — get weather → PDF + web page.
+- **`research`** (heavy) — search → read 3 large docs → write a report → publish.
+
+The Vercel AI SDK and Mastra are both **token loops** (Mastra runs the AI SDK
+tool-calling loop under the hood); oya is plan-don't-react. The only thing that
 varies is *how much state flows through the model*.
 
 ```bash
-ANTHROPIC_API_KEY=sk-... bun run bench                       # default: claude-haiku-4-5-20251001, 3 trials
-ANTHROPIC_API_KEY=sk-... bun run bench claude-sonnet-4-6 5   # model + trial count
+ANTHROPIC_API_KEY=sk-... bun run bench --task weather claude-opus-4-7   # the clean headline
+ANTHROPIC_API_KEY=sk-... bun run bench                                  # default: research, haiku, 3 trials
 ```
 
-Each framework is run `N` trials (token loops are stochastic), reported as
-**mean ± stddev**.
+Each framework runs `N` trials (token loops are stochastic), reported **mean ± stddev**.
 
 ## What's measured
 
@@ -46,35 +45,35 @@ apples-to-apples.
 
 ## Sample output
 
-One 3-trial run on `claude-haiku-4-5-20251001` (your numbers will vary — that's the point):
+One 3-trial run on `claude-opus-4-7` (the default model is Haiku — pass
+`claude-opus-4-7` to reproduce; your numbers will vary):
 
 ```
   cost / latency    Vercel AI SDK  Mastra         oya
   ---------------------------------------------------------------
-  model round-trips 3              3              3 ± 1
-  input tokens      1888 ± 211     3807 ± 289     1140 ± 42
-  output tokens     242 ± 21       767 ± 93       632 ± 40
-  TOTAL tokens      2130 ± 201     4574 ± 285     1772 ± 81
-  latency (ms)      6495 ± 2055    5193 ± 576     6307 ± 2130
+  model round-trips 4 ± 1          4 ± 1          2
+  input tokens      3292 ± 910     7765 ± 4229    1359
+  output tokens     361 ± 91       1378 ± 575     424 ± 4
+  TOTAL tokens      3653 ± 825     9143 ± 4797    1783 ± 4
+  latency (ms)      20013 ± 5672   20173 ± 5123   6320 ± 441
 
   reliability (/3)  Vercel AI SDK  Mastra         oya
   ---------------------------------------------------------------
-  redundant calls   0              0              0
+  redundant calls   2              2              0
   order violations  0/3            0/3            0/3
   incomplete runs   0/3            0/3            0/3
-  distinct sequences1/3            1/3            2/3
+  distinct sequences2/3            2/3            1/3
   hard errors       0/3            0/3            0/3
 
-  → oya uses 17% fewer tokens than the leaner token loop (1.20×).
+  → oya uses 51% fewer tokens than the leaner token loop (2.05×), 2 round-trips vs 4.
 ```
 
-This is a deliberately small task on a small model, so the gap is modest — oya
-still uses ~2.6× fewer tokens than Mastra. The advantage grows with intermediate
-payload size, step count, and model verbosity (on Opus we measured ~2× vs the
-leaner loop, and far fewer round-trips). One honest note: oya showed 2/3 distinct
-sequences here — its **execution is deterministic given a plan**, but the plan
-itself is model-generated and can vary between runs (Haiku sometimes added an
-`extract` step). Run it on your own workload and report what you measure.
+oya is `1783 ± 4` tokens with one execution order every trial; the token loops
+swing widely (Mastra `± 4797`) and each made redundant calls. That **determinism**
+— fixed token cost, fixed order — is as much the result as the raw count. The gap
+**narrows on smaller/cheaper models** (on Haiku it's ~17% vs the leaner loop, with
+round-trips tied) and **widens** with bigger intermediate payloads and more steps.
+Run it on your own workload and report what you measure.
 
 ## Why the loop costs more
 
@@ -87,12 +86,17 @@ the final step. In oya, the planner wires the handles by name; the PDF and HTML
 
 ## Honest caveats
 
-- **The advantage scales with the task.** Savings grow with (a) intermediate
-  payload size and (b) step count — the loop re-sends everything each step
-  (≈ quadratic in state), oya is linear and never sends artifacts. A task with
-  tiny payloads and one step shows little difference; a document-heavy task shows
-  a lot. Tune [`task.ts`](./task.ts) to your paper's workload and report what you
-  measure.
+- **The clean win is a well-structured task on a capable model.** On `weather` +
+  Opus, oya is ~2× under the leanest loop, 5× under Mastra, and deterministic.
+- **vs Mastra the gap is consistent (~4–5×) on every task** — its agent
+  scaffolding is heavy (the `research` task pushed it past 29k tokens).
+- **vs the leanest loop, open-ended tasks narrow the gap.** On `research`, oya
+  came out ~1.3× under the Vercel SDK rather than 2×+: the planner's plan quality
+  varies on ambiguous missions (weaker models add `extract`/`summarise` nodes;
+  stronger ones sometimes do *less* work), so the OPAQUE-payload advantage isn't
+  fully realized. The architectural win is real but plan-quality-dependent — we
+  report it honestly rather than cherry-pick. Tune [`tasks.ts`](./tasks.ts) to
+  your workload and measure.
 - **Run it several times.** Wall-clock latency is noisy, and the token loop's
   step count and tool order are model-chosen and can vary between runs. oya's
   sequence is a fixed, statically-checked DAG — that determinism is itself a

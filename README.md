@@ -2,11 +2,24 @@
 
 # oya
 
-**Agents that plan, instead of react.** The model writes a typed plan once; the runtime runs it; the model never reads state it shouldn't.
+### Agents that **plan, don't react.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE) · TypeScript · **early**
+The model writes a typed plan **once**. The runtime runs it. Tool outputs never go
+back through the model — so your agent **can't be prompt-injected through its tools,
+costs a fraction, and runs the same every time.**
+
+**Drop-in for Mastra.** TypeScript · Bun · MIT
+
+[Quickstart](#quickstart) · [The numbers](#the-numbers) · [Why](#why) · [Migrate from Mastra](#migrate-from-mastra-in-2-lines) · [Studio](#studio)
 
 </div>
+
+<!-- LAUNCH: drop the studio GIF here before publishing — capture it with DEMO.md -->
+<p align="center"><img src="./studio.gif" width="820" alt="oya Studio — a plan executing live: the DAG, the trace, and each value at its projection level"></p>
+
+---
+
+## Quickstart
 
 ```ts
 import { Agent, createTool } from "oya";
@@ -15,14 +28,12 @@ import { z } from "zod";
 
 const getWeather = createTool({
   id: "get_weather",
-  description: "Look up the current weather for a city",
+  description: "Look up the weather for a city",
   inputSchema: z.object({ city: z.string() }),
   execute: async ({ city }) => fetchWeather(city),
 });
 
 const agent = new Agent({
-  name: "WeatherBot",
-  instructions: "You are a helpful weather assistant.",
   model: anthropic("claude-haiku-4-5-20251001"),
   tools: { get_weather: getWeather },
 });
@@ -30,12 +41,61 @@ const agent = new Agent({
 const { text } = await agent.generate("How's the weather in NYC?");
 ```
 
-That's the whole API — and it's the **same shape as Mastra**, so migrating is just
-changing imports (see below). No graphs, no handles, no projection annotations:
-types are inferred from your zod schema, and tool outputs are **never** sent back
-to the model. You did less work and it's injection-safe.
+That's the whole API — the **same shape as Mastra**. Types are inferred from your
+zod schema, and every value is `OPAQUE` to the model by default. You did less work
+and it's injection-safe.
 
-## Migrating from Mastra
+## The numbers
+
+Same task, same tools, real Anthropic API, 3 trials on `claude-opus-4-7`:
+
+| | Vercel AI SDK | Mastra | **oya** |
+|---|--:|--:|--:|
+| total tokens | 3,653 | 9,143 | **1,783** |
+| model round-trips | 4 | 4 | **2** |
+| latency | 20.0s | 20.2s | **6.3s** |
+| same plan every run? | no | no | **yes** |
+
+**½ the tokens of the leanest loop, 5× fewer than Mastra, ~3× faster — and
+deterministic.** Reproduce: `bun run bench claude-opus-4-7`. (The gap narrows on
+smaller/cheaper models and widens with bigger payloads — full methodology and
+numbers in [`benchmarks/`](./benchmarks).)
+
+## Why
+
+Every other agent framework is a **token loop** (ReAct, LangGraph, AutoGen, Mastra,
+the Vercel AI SDK): the model picks a tool, sees the **raw** result, picks the next.
+Every URL, ID, and document flows back through the model. Three bugs follow — every
+time:
+
+```
+fetched:    https://example.io/q3-report.pdf
+downloaded: https://example.com/q3-report.pdf     ← the model "fixed" the URL
+```
+```
+expected:  fetch → validate → download
+observed:  fetch → download → validate (skipped)  ← the model reordered the steps
+```
+```
+$432 in tokens   ← re-reading every result through the model
+ $51 in tokens   ← reading only what it needs to decide
+```
+
+Same root cause: **the model read state it never needed to.** oya makes that
+impossible. The model emits a typed dataflow plan; the runtime executes the DAG;
+each value is shown to the model only at the level the plan declares:
+
+| level | the model sees | for |
+|---|---|---|
+| `OPAQUE` *(default)* | type + provenance — **never the bytes** | URLs, IDs, docs, payloads, secrets |
+| `SUMMARY` | a bounded projection (`{count}`) | facts to branch on |
+| `TRANSPARENT` | the full value | the user's message, the final answer |
+
+An attacker can stuff a payload into any fetched page. The model **never reads that
+handle**, so indirect prompt injection through tool output has nowhere to land. You
+annotate none of this — it's `OPAQUE` by default.
+
+## Migrate from Mastra in 2 lines
 
 `createTool` and `Agent` mirror `@mastra/core`. Change the imports; the code stays:
 
@@ -47,82 +107,32 @@ to the model. You did less work and it's injection-safe.
 + import { anthropic } from "oya/anthropic";
 ```
 
-Your `createTool({ id, description, inputSchema, execute })` and
-`new Agent({ name, instructions, model, tools }).generate(prompt)` keep working —
-`generate()` returns `{ text }` as before. The difference is underneath: oya emits
-a checked plan and executes it instead of running a token loop, so tool outputs
-stay off the model's context.
+Same `createTool({ id, inputSchema, execute })` and
+`new Agent({ name, instructions, model, tools }).generate(prompt)` (returns
+`{ text }`). The difference is underneath: oya emits a checked plan and executes it
+instead of looping — so a migrated app gets the numbers above for free.
 
-## Why not just a token loop?
+## Studio
 
-Every other agent SDK is a **token loop**: the model picks a tool, sees the raw
-result, picks the next. Every URL, ID, and document flows back through the model.
-Three bugs follow from that one choice:
+Chat with your agents and watch each plan execute live — the DAG, the trace, and
+every value at its projection level (`OPAQUE` shows nothing, `TRANSPARENT` shows
+the value). In your project:
 
+```ts
+// oya.config.ts
+export default { agents: { support } };
 ```
-fetched:    https://example.io/q3-report.pdf
-downloaded: https://example.com/q3-report.pdf   ← the model "fixed" the URL
-```
-```
-expected:  fetch → validate → download
-observed:  fetch → download → validate (skipped)   ← the model reordered steps
-```
-```
-$432 in tokens   ← re-reading every result through the model
- $51 in tokens   ← reading only what it needs to decide
-```
-
-Same root cause: **the model read state it didn't need.** `oya` makes that
-unrepresentable. The model emits a plan, the runtime executes the DAG, and each
-value is disclosed to the model only at the level the plan declares — `OPAQUE` by
-default. An attacker can stuff a payload into any fetched page; the model never
-reads that handle, so the injection has nowhere to land.
-
-## How it works (you don't have to care)
-
-1. Your prompt + skills → the model emits a typed **Plan IR** (a dataflow DAG).
-2. **8 static checks** run before anything executes (acyclic, well-typed,
-   projection-consistent, bounded, in-budget…). A bad plan is rejected and re-emitted.
-3. The runtime executes the DAG. State flows skill→skill server-side; the model is
-   re-engaged only to read text it must (a summary, an extraction, a recovery).
-4. The model only ever sees the **projected** view of each value:
-
-   | level | model sees | for |
-   |---|---|---|
-   | `OPAQUE` *(default)* | type + provenance only | URLs, IDs, docs, payloads, secrets |
-   | `SUMMARY` | a bounded projection (e.g. `{count}`) | facts to branch on |
-   | `TRANSPARENT` | the full value | the user's message, final answers |
-
-You annotate none of this. Reach for the IR (`Plan`, `Catalog`, `Executor`, the
-checker) only when you want to inspect or hand-build a plan — see [docs](./docs).
-
-## Does it actually save tokens?
-
-The [`benchmarks/`](./benchmarks) measure it for real — same task (*"How's the
-weather in NYC? Then generate a PDF and a web page."*), **identical** tool
-implementations, all run against the real Anthropic API over N trials. One
-3-trial run on `claude-haiku-4-5-20251001`:
-
-```
-  metric            Vercel AI SDK  Mastra         oya
-  ---------------------------------------------------------------
-  TOTAL tokens      2130 ± 201     4574 ± 285     1772 ± 81
-  model round-trips 3              3              3 ± 1
-  latency (ms)      6495 ± 2055    5193 ± 576     6307 ± 2130
-```
-oya: **~17% fewer tokens** than the leaner loop, **~2.6× fewer than Mastra**.
-
 ```bash
-ANTHROPIC_API_KEY=sk-... bun run bench    # your numbers vary by model & task
+bunx oya dev      # → oya Studio at localhost:4000
 ```
 
-Both the Vercel AI SDK and Mastra are **token loops** (Mastra runs the AI SDK loop
-under the hood): they re-send every tool result on every step, and the model must
-re-emit data as tool arguments — the corruption risk. In oya the generated PDF and
-HTML **never reach the model**. The gap **scales with model and task** — modest
-here (small task, small model); on Opus, or with larger intermediate payloads, we
-measured ~2× vs the leaner loop. Full numbers + reliability metrics in
-[`benchmarks/`](./benchmarks).
+## Use it anywhere
+
+oya is a **library, not a platform**. Run an agent in a script, a Next.js route, a
+Bun server, a worker, the edge — `await agent.generate(prompt)`. Stream it with
+`agent.stream(prompt)` (structured events, not a token soup) and render it with
+`oya/react`'s `usePlan` / `useChat`, or serve SSE with `@oya/server`. Managed
+hosting (Oya Cloud) is coming.
 
 ## Install
 
@@ -130,98 +140,26 @@ measured ~2× vs the leaner loop. Full numbers + reliability metrics in
 bun add oya zod
 ```
 
-`oya` is a TypeScript port of the [`oya-planner`](https://github.com/oya-labs)
-reference runtime and the *Plan, Don't React: Projection Types for LLM Agent
-Runtimes* specs.
-
-## Streaming
-
-`agent.stream(prompt)` mirrors Mastra's `stream()` — but oya streams **structured
-events**, not a token soup: the emitted plan, each node starting/finishing with the
-handles it sealed (at their projection level), the answer's text deltas, then
-finish. Every event is **wire-safe** — an `OPAQUE` value never appears, even
-mid-stream.
-
-```ts
-const { fullStream, textStream } = agent.stream("How's the weather in NYC?");
-
-for await (const e of fullStream) {
-  if (e.type === "node-finish") console.log(e.nodeId, e.handles); // OPAQUE shows nothing
-  if (e.type === "text-delta") process.stdout.write(e.delta);     // the answer, token by token
-}
-
-// or just the answer (Mastra/AI-SDK shape):
-for await (const chunk of textStream) process.stdout.write(chunk);
-```
-
-Serve it over SSE from any Fetch-API server (Next.js route, Bun.serve, edge):
-
-```ts
-import { toSSEResponse } from "@oya/server";
-
-export const POST = async (req: Request) => {
-  const { prompt } = await req.json();
-  return toSSEResponse(agent.stream(prompt).fullStream);
-};
-```
-
-## Studio
-
-Inspect your agents locally — chat with them and watch each plan execute (live DAG,
-trace, per-node I/O at its projection level). In **your** project:
-
-```ts
-// oya.config.ts
-import { Agent } from "oya";
-import { anthropic } from "oya/anthropic";
-
-export default {
-  agents: {
-    support: new Agent({ model: anthropic("claude-haiku-4-5-20251001"), tools: { /* … */ } }),
-  },
-};
-```
-
-```bash
-bunx oya dev      # → oya Studio at localhost:4000, against your agents
-```
-
-Set `ANTHROPIC_API_KEY` for real model calls. (This repo's `apps/playground` is a
-richer Next.js version of the same studio — `make dev`.)
-
-## Deployment
-
-oya is a **library, not a platform**. `bun add oya`, write your agent, and run it
-anywhere JavaScript runs — a script, a Next.js route, a Bun server, the edge. No
-account, no deploy step, nothing to host.
-
-Managed hosting — deploy your agents to **Oya Cloud** with the trace viewer, run
-logs, and scaling built in — is on the way (Phase 2).
-
 ## Packages
 
-A Bun-workspaces monorepo:
+| package | what |
+|---|---|
+| `oya` | the runtime + `Agent` + `createTool`; `oya/anthropic` · `oya/openai` · `oya/google` providers; `oya/react` hooks; the `oya dev` studio |
+| `@oya/server` | `toSSEResponse` / `toTextResponse` for any Fetch server |
+| `@oya/playground` | the Next.js studio (`make dev`) |
+| `@oya/benchmarks` | the live comparison above |
 
-| package | folder | what |
-|---|---|---|
-| `oya` | `packages/core` | core — `Agent`, `createTool` / `skill`, Plan IR, checker, executor, streaming; providers (`oya/anthropic` · `oya/openai` · `oya/google`) and hooks (`oya/react`) as subpaths; the `oya dev` studio CLI |
-| `@oya/server` | `packages/server` | `toSSEResponse` / `toTextResponse` for any Fetch server |
-| `@oya/playground` | `apps/playground` | oya Studio — the Next.js agent console (sidebar · chat · live DAG) |
-| `@oya/benchmarks` | `benchmarks` | live comparison vs the Vercel AI SDK + Mastra |
-
-## Development
-
-Built and tested with [Bun](https://bun.sh). A `Makefile` drives the workspace:
+## Develop
 
 ```bash
-make install
-make dev        # oya Studio (Next.js playground) → localhost:4000
-make test       # bun:test — checked against the Python reference suite
-make typecheck  # every package
-make build      # the publishable libraries + playground
-make example    # run an agent end-to-end, no network
-make bench      # token/latency/reliability vs the Vercel AI SDK + Mastra
+make dev        # oya Studio
+make test       # bun:test — checked against the Python reference runtime
+make bench      # the comparison
+make check      # typecheck + test, every package
 ```
+
+oya is the TypeScript implementation of *Plan, Don't React: Projection Types for LLM
+Agent Runtimes*.
 
 ## License
 

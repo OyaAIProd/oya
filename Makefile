@@ -22,6 +22,9 @@ dev: build-libs ## Start oya Studio (the Next.js playground) at http://localhost
 example: ## Run the weather example end-to-end (no network)
 	cd packages/core && bun run example
 
+demo: ## Play the paced terminal demo (for a GIF capture; no key)
+	cd packages/core && bun run demo
+
 test: ## Run the core test suite
 	cd packages/core && bun test
 
