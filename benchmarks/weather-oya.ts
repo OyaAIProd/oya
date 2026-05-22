@@ -6,8 +6,8 @@
  * ANTHROPIC_API_KEY.
  */
 
-import { Agent, createTool } from "../src/index.js";
-import { anthropic } from "../src/anthropic/index.js"; // = "oya/anthropic"
+import { Agent, createTool } from "oya";
+import { anthropic } from "oya/anthropic"; // = "oya/anthropic"
 import { z } from "zod";
 
 import { MISSION, generatePdf, generateWebpage, getWeather } from "./task.js";

@@ -1,18 +1,21 @@
 # Contributing to oya
 
-Thanks for your interest. `oya` is early and we welcome help — especially on the
-provider, agent-DX, streaming, and dev-server surfaces (see the README roadmap).
+Thanks for your interest. `oya` is early and we welcome help — providers, the
+agent DX, streaming, and the playground.
 
 ## Setup
 
-Built and tested with [Bun](https://bun.sh) (≥ 1.1).
+A Bun-workspaces monorepo (`packages/core` = `oya`, `packages/server` =
+`@oya/server`, `apps/playground` = the Next.js studio, `benchmarks`). Built and
+tested with [Bun](https://bun.sh) (≥ 1.1); a `Makefile` drives it.
 
 ```bash
-bun install
-bun test            # bun:test
-bun run typecheck   # tsc --noEmit
-bun run build       # tsup -> dist (ESM + CJS + d.ts)
-bun run example     # run the weather example end-to-end (no network)
+make install
+make test        # bun:test (core)
+make typecheck   # every package
+make build       # publishable libs + playground
+make dev         # oya Studio at localhost:4000
+make example     # the weather example, no network
 ```
 
 ## The correctness oracle

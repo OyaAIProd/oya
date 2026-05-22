@@ -157,13 +157,37 @@ for await (const chunk of textStream) process.stdout.write(chunk);
 Serve it over SSE from any Fetch-API server (Next.js route, Bun.serve, edge):
 
 ```ts
-import { toSSEResponse } from "oya/server";
+import { toSSEResponse } from "@oya/server";
 
 export const POST = async (req: Request) => {
   const { prompt } = await req.json();
   return toSSEResponse(agent.stream(prompt).fullStream);
 };
 ```
+
+## Studio
+
+Inspect your agents locally — chat with them and watch each plan execute (live DAG,
+trace, per-node I/O at its projection level). In **your** project:
+
+```ts
+// oya.config.ts
+import { Agent } from "oya";
+import { anthropic } from "oya/anthropic";
+
+export default {
+  agents: {
+    support: new Agent({ model: anthropic("claude-haiku-4-5-20251001"), tools: { /* … */ } }),
+  },
+};
+```
+
+```bash
+bunx oya dev      # → oya Studio at localhost:4000, against your agents
+```
+
+Set `ANTHROPIC_API_KEY` for real model calls. (This repo's `apps/playground` is a
+richer Next.js version of the same studio — `make dev`.)
 
 ## Deployment
 
@@ -176,26 +200,27 @@ logs, and scaling built in — is on the way (Phase 2).
 
 ## Packages
 
-`oya` ships as one package with subpath entry points:
+A Bun-workspaces monorepo:
 
-| import | what |
-|---|---|
-| `oya` | core — `Agent`, `createTool` / `skill`, the Plan IR, static checker, executor, streaming |
-| `oya/anthropic` · `oya/openai` · `oya/google` | model providers (`complete` + token streaming) |
-| `oya/server` | `toSSEResponse` for any Fetch server, and `createDevServer` (a live trace viewer) |
-| `oya/react` | `usePlan` / `useChat` hooks — render the DAG and watch handles seal (React peer dep) |
+| package | folder | what |
+|---|---|---|
+| `oya` | `packages/core` | core — `Agent`, `createTool` / `skill`, Plan IR, checker, executor, streaming; providers (`oya/anthropic` · `oya/openai` · `oya/google`) and hooks (`oya/react`) as subpaths; the `oya dev` studio CLI |
+| `@oya/server` | `packages/server` | `toSSEResponse` / `toTextResponse` for any Fetch server |
+| `@oya/playground` | `apps/playground` | oya Studio — the Next.js agent console (sidebar · chat · live DAG) |
+| `@oya/benchmarks` | `benchmarks` | live comparison vs the Vercel AI SDK + Mastra |
 
 ## Development
 
-Built and tested with [Bun](https://bun.sh).
+Built and tested with [Bun](https://bun.sh). A `Makefile` drives the workspace:
 
 ```bash
-bun install
-bun test            # bun:test — checked against the Python reference suite
-bun run typecheck
-bun run build
-bun run example     # run an agent end-to-end, no network
-bun run bench       # token/round-trip comparison vs the Vercel AI SDK + Mastra
+make install
+make dev        # oya Studio (Next.js playground) → localhost:4000
+make test       # bun:test — checked against the Python reference suite
+make typecheck  # every package
+make build      # the publishable libraries + playground
+make example    # run an agent end-to-end, no network
+make bench      # token/latency/reliability vs the Vercel AI SDK + Mastra
 ```
 
 ## License

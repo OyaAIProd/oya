@@ -1,20 +1,15 @@
 /**
- * oya Studio — local agent console.
- *
- *   make dev      (or: bun examples/dev.ts)  →  http://localhost:4000
- *
- * Registers two agents. Uses the Anthropic provider when ANTHROPIC_API_KEY is
- * set; otherwise a canned local model per agent, so it runs with no key.
+ * The agents the playground serves. Real Anthropic when ANTHROPIC_API_KEY is set,
+ * otherwise canned local models so the studio runs with no key.
  */
 
-import { Agent, createTool, type LanguageModel } from "../src/index.js";
-import { anthropic } from "../src/anthropic/index.js";
-import { createDevServer } from "../src/server/index.js";
+import { Agent, createTool, type LanguageModel } from "oya";
+import { anthropic } from "oya/anthropic";
 import { z } from "zod";
 
 const live = !!process.env.ANTHROPIC_API_KEY;
+const MODEL = "claude-haiku-4-5-20251001";
 
-/** A canned model: emit a fixed plan, then stream a fixed answer word-by-word. */
 function canned(plan: unknown, answer: string): LanguageModel {
   return {
     provider: "local",
@@ -27,8 +22,6 @@ function canned(plan: unknown, answer: string): LanguageModel {
     },
   };
 }
-
-// --- WeatherBot: weather → PDF + web page ---------------------------------
 
 const weatherTools = {
   get_weather: createTool({
@@ -68,15 +61,6 @@ const weatherPlan = {
   exits: ["answer", "pdf", "page"],
 };
 
-const WeatherBot = new Agent({
-  name: "WeatherBot",
-  instructions: "You are a helpful weather assistant. Use the tools, then reply concisely.",
-  model: live ? anthropic("claude-haiku-4-5-20251001") : canned(weatherPlan, "It's 72°F and sunny in NYC (41% humidity). The PDF and web page are ready."),
-  tools: weatherTools,
-});
-
-// --- ResearchBot: fetch a page → summarise --------------------------------
-
 const researchTools = {
   fetch_url: createTool({
     id: "fetch_url",
@@ -99,12 +83,28 @@ const researchPlan = {
   exits: ["answer"],
 };
 
-const ResearchBot = new Agent({
-  name: "ResearchBot",
-  instructions: "You research the web. Fetch the page, then summarise it for the user.",
-  model: live ? anthropic("claude-haiku-4-5-20251001") : canned(researchPlan, "Here's a summary of the page: it's a short example document with no notable content."),
-  tools: researchTools,
-});
+// ─────────────────────────────────────────────────────────────────────────
+// Register your agents here. Each key becomes a tab in the studio sidebar and
+// is callable at POST /api/run { agent, prompt }. Add an entry and it shows up.
+// ─────────────────────────────────────────────────────────────────────────
+export const agents: Record<string, Agent> = {
+  WeatherBot: new Agent({
+    name: "WeatherBot",
+    instructions: "You are a helpful weather assistant. Use the tools, then reply concisely.",
+    model: live ? anthropic(MODEL) : canned(weatherPlan, "It's 72°F and sunny in NYC (41% humidity). The PDF and web page are ready."),
+    tools: weatherTools,
+  }),
+  ResearchBot: new Agent({
+    name: "ResearchBot",
+    instructions: "You research the web. Fetch the page, then summarise it for the user.",
+    model: live ? anthropic(MODEL) : canned(researchPlan, "Here's a summary of the page: a short example document with no notable content."),
+    tools: researchTools,
+  }),
 
-createDevServer({ agents: { WeatherBot, ResearchBot }, port: 4000 });
-if (!live) console.log("(no ANTHROPIC_API_KEY — using canned local models; set the key for real runs)");
+  // MyAgent: new Agent({
+  //   name: "MyAgent",
+  //   instructions: "…",
+  //   model: anthropic("claude-haiku-4-5-20251001"),
+  //   tools: { my_tool: createTool({ id: "my_tool", inputSchema: z.object({ … }), execute: async (input) => … }) },
+  // }),
+};

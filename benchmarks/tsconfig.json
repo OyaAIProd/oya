@@ -1,7 +1,10 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true
+    "paths": {
+      "oya": ["../packages/core/src/index.ts"],
+      "oya/anthropic": ["../packages/core/src/anthropic/index.ts"]
+    }
   },
   "include": ["."]
 }

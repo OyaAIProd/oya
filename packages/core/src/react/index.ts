@@ -24,6 +24,8 @@ export interface NodeState {
 
 export interface PlanState {
   status: "idle" | "streaming" | "done" | "error";
+  /** The emitted plan (raw, as it arrived) — for drawing the DAG. */
+  plan: unknown | null;
   nodes: NodeState[];
   text: string;
   error: string | null;
@@ -32,6 +34,7 @@ export interface PlanState {
 
 export const initialPlanState: PlanState = {
   status: "idle",
+  plan: null,
   nodes: [],
   text: "",
   error: null,
@@ -47,6 +50,7 @@ export function applyEvent(state: PlanState, e: OyaEvent): PlanState {
         ...state,
         events,
         status: "streaming",
+        plan: e.plan,
         nodes: e.plan.nodes.map((n) => ({
           nodeId: n.id,
           kind: n.kind,
