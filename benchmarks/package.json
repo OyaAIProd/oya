@@ -12,7 +12,7 @@
     "@ai-sdk/anthropic": "^3.0.78",
     "@mastra/core": "^1.36.0",
     "ai": "^6.0.190",
-    "oya": "workspace:*",
+    "oyadotai": "workspace:*",
     "zod": "^3.23.8"
   }
 }

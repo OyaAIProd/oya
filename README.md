@@ -22,8 +22,8 @@ costs a fraction, and runs the same every time.**
 ## Quickstart
 
 ```ts
-import { Agent, createTool } from "oya";
-import { anthropic } from "oya/anthropic";
+import { Agent, createTool } from "oyadotai";
+import { anthropic } from "oyadotai/anthropic";
 import { z } from "zod";
 
 const getWeather = createTool({
@@ -57,9 +57,39 @@ Same task, same tools, real Anthropic API, 3 trials on `claude-opus-4-7`:
 | same plan every run? | no | no | **yes** |
 
 **½ the tokens of the leanest loop, 5× fewer than Mastra, ~3× faster — and
-deterministic.** Reproduce: `bun run bench claude-opus-4-7`. (The gap narrows on
-smaller/cheaper models and widens with bigger payloads — full methodology and
-numbers in [`benchmarks/`](./benchmarks).)
+deterministic.** (The gap narrows on smaller/cheaper models and widens with bigger
+payloads — full methodology and numbers in [`benchmarks/`](./benchmarks).)
+
+### Verify it yourself
+
+Don't take the table on faith — run it. The benchmark hits the **real Anthropic
+API** with identical tasks and identical tool implementations for all three
+frameworks ([`benchmarks/tasks.ts`](./benchmarks/tasks.ts)); the only thing that
+varies is how much state flows through the model.
+
+```bash
+# 1. clone and install (needs Bun ≥ 1.1 — https://bun.sh)
+git clone https://github.com/OyaAIProd/oya && cd oya
+bun install
+
+# 2. give it your Anthropic key (env var, or drop it in a .env at the repo root)
+export ANTHROPIC_API_KEY=sk-ant-...
+
+# 3. run the comparison
+bun run bench                                  # default: research task, Haiku, 3 trials
+bun run bench --task weather claude-opus-4-7   # the headline run from the table above
+```
+
+Args go in any order: a **model id** (defaults to Haiku), a **trial count**
+(integer, defaults to `3`), and `--task weather` or `--task research` (defaults to
+`research`). `make bench` does the same and auto-loads `.env`.
+
+Each framework runs the task N times against the same model and prints
+**mean ± stddev** — the stddev is the point: oya's token cost and tool order barely
+move, while the token loops swing (Mastra's total swung ±4797 in our run). Token
+loops are stochastic, so **run it a few times**; your absolute numbers will differ
+by model and payload. Full methodology, caveats, and where the gap narrows are in
+[`benchmarks/README.md`](./benchmarks/README.md).
 
 ## Why
 
@@ -103,8 +133,8 @@ annotate none of this — it's `OPAQUE` by default.
 - import { Agent } from "@mastra/core/agent";
 - import { createTool } from "@mastra/core/tools";
 - import { anthropic } from "@ai-sdk/anthropic";
-+ import { Agent, createTool } from "oya";
-+ import { anthropic } from "oya/anthropic";
++ import { Agent, createTool } from "oyadotai";
++ import { anthropic } from "oyadotai/anthropic";
 ```
 
 Same `createTool({ id, inputSchema, execute })` and
@@ -123,7 +153,7 @@ the value). In your project:
 export default { agents: { support } };
 ```
 ```bash
-bunx oya dev      # → oya Studio at localhost:4000
+bunx oyadotai dev      # → oya Studio at localhost:4000
 ```
 
 ## Use it anywhere
@@ -131,21 +161,21 @@ bunx oya dev      # → oya Studio at localhost:4000
 oya is a **library, not a platform**. Run an agent in a script, a Next.js route, a
 Bun server, a worker, the edge — `await agent.generate(prompt)`. Stream it with
 `agent.stream(prompt)` (structured events, not a token soup) and render it with
-`oya/react`'s `usePlan` / `useChat`, or serve SSE with `@oya/server`. Managed
+`oya/react`'s `usePlan` / `useChat`, or serve SSE with `oyadotai-server`. Managed
 hosting (Oya Cloud) is coming.
 
 ## Install
 
 ```bash
-bun add oya zod
+bun add oyadotai zod
 ```
 
 ## Packages
 
 | package | what |
 |---|---|
-| `oya` | the runtime + `Agent` + `createTool`; `oya/anthropic` · `oya/openai` · `oya/google` providers; `oya/react` hooks; the `oya dev` studio |
-| `@oya/server` | `toSSEResponse` / `toTextResponse` for any Fetch server |
+| `oyadotai` | the runtime + `Agent` + `createTool`; `oyadotai/anthropic` · `oyadotai/openai` · `oyadotai/google` providers; `oyadotai/react` hooks; the `oya dev` studio |
+| `oyadotai-server` | `toSSEResponse` / `toTextResponse` for any Fetch server |
 | `@oya/playground` | the Next.js studio (`make dev`) |
 | `@oya/benchmarks` | the live comparison above |
 

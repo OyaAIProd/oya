@@ -1,9 +1,12 @@
 {
-  "name": "@oya/server",
+  "name": "oyadotai-server",
   "version": "0.1.0",
   "description": "Fetch-API server helpers for oya agents (SSE / text streaming).",
   "license": "MIT",
   "author": "Oya Labs, Inc.",
+  "repository": { "type": "git", "url": "git+https://github.com/OyaAIProd/oya.git", "directory": "packages/server" },
+  "homepage": "https://github.com/OyaAIProd/oya#readme",
+  "bugs": { "url": "https://github.com/OyaAIProd/oya/issues" },
   "type": "module",
   "sideEffects": false,
   "engines": { "node": ">=18" },
@@ -19,9 +22,9 @@
     "build": "tsup",
     "typecheck": "tsc --noEmit"
   },
-  "peerDependencies": { "oya": "*" },
+  "peerDependencies": { "oyadotai": "*" },
   "devDependencies": {
-    "oya": "workspace:*",
+    "oyadotai": "workspace:*",
     "tsup": "^8.3.0"
   }
 }

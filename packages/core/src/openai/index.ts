@@ -1,7 +1,7 @@
 /**
  * The OpenAI provider — `oya/openai`.
  *
- *     import { openai } from "oya/openai";
+ *     import { openai } from "oyadotai/openai";
  *     const agent = new Agent({ model: openai("gpt-4o"), tools });
  *
  * No SDK dependency: talks to the Chat Completions API over `fetch`. Reads

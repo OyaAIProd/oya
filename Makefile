@@ -9,7 +9,7 @@ help: ## Show available targets
 install: ## Install all workspace dependencies
 	bun install
 
-build-libs: ## Build the publishable libraries (oya + @oya/server)
+build-libs: ## Build the publishable libraries (oyadotai + oyadotai-server)
 	cd packages/core && bun run build
 	cd packages/server && bun run build
 
@@ -48,4 +48,4 @@ clean: ## Remove build output and caches
 
 deploy: ## Deploy agents to Oya Cloud (Phase 2 — not yet available)
 	@echo "Oya Cloud deployment is Phase 2 — coming soon."
-	@echo "Today, oya runs anywhere as a library: 'bun add oya' and ship it in any Node/Bun/edge runtime."
+	@echo "Today, oya runs anywhere as a library: 'bun add oyadotai' and ship it in any Node/Bun/edge runtime."

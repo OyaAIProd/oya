@@ -1,4 +1,4 @@
-import { toSSEResponse } from "@oya/server";
+import { toSSEResponse } from "oyadotai-server";
 
 import { agents } from "../../../lib/agents";
 

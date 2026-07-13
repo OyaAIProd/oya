@@ -8,12 +8,12 @@
     "bun": ">=1.1"
   },
   "scripts": {
-    "build": "bun run --filter oya build && bun run --filter '@oya/server' build",
-    "test": "bun run --filter oya test",
+    "build": "bun run --filter oyadotai build && bun run --filter 'oyadotai-server' build",
+    "test": "bun run --filter oyadotai test",
     "typecheck": "bun run --filter '*' typecheck",
     "dev": "bun run --filter '@oya/playground' dev",
     "bench": "bun run --filter '@oya/benchmarks' bench",
-    "example": "bun run --filter oya example",
+    "example": "bun run --filter oyadotai example",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs"
   },

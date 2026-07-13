@@ -3,8 +3,8 @@
  * otherwise canned local models so the studio runs with no key.
  */
 
-import { Agent, createTool, type LanguageModel } from "oya";
-import { anthropic } from "oya/anthropic";
+import { Agent, createTool, type LanguageModel } from "oyadotai";
+import { anthropic } from "oyadotai/anthropic";
 import { z } from "zod";
 
 const live = !!process.env.ANTHROPIC_API_KEY;

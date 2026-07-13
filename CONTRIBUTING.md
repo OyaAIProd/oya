@@ -5,8 +5,8 @@ agent DX, streaming, and the playground.
 
 ## Setup
 
-A Bun-workspaces monorepo (`packages/core` = `oya`, `packages/server` =
-`@oya/server`, `apps/playground` = the Next.js studio, `benchmarks`). Built and
+A Bun-workspaces monorepo (`packages/core` = `oyadotai`, `packages/server` =
+`oyadotai-server`, `apps/playground` = the Next.js studio, `benchmarks`). Built and
 tested with [Bun](https://bun.sh) (≥ 1.1); a `Makefile` drives it.
 
 ```bash

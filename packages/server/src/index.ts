@@ -1,8 +1,8 @@
 /**
- * `@oya/server` — turn an agent's event stream into a Fetch `Response` you can
+ * `oyadotai-server` — turn an agent's event stream into a Fetch `Response` you can
  * return from any server: a Next.js route handler, Bun.serve, or the edge.
  *
- *     import { toSSEResponse } from "@oya/server";
+ *     import { toSSEResponse } from "oyadotai-server";
  *
  *     export const POST = async (req: Request) => {
  *       const { prompt } = await req.json();
@@ -12,7 +12,7 @@
  * The visual playground (sidebar / chat / live DAG) lives in `apps/playground`.
  */
 
-import type { OyaEvent } from "oya";
+import type { OyaEvent } from "oyadotai";
 
 /** Server-Sent-Events `Response` carrying every structured event as JSON. */
 export function toSSEResponse(stream: AsyncIterable<OyaEvent>): Response {

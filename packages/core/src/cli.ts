@@ -2,7 +2,7 @@
 /**
  * The `oya` CLI. Today: `oya dev` — start oya Studio against the agents you export
  * from `oya.config.ts` in your project. Runs under Bun (so your TS config loads
- * directly); ships in the `oya` package, so `bunx oya dev` just works.
+ * directly); ships in the `oyadotai` package, so `bunx oyadotai dev` just works.
  */
 
 import { existsSync } from "node:fs";
@@ -17,8 +17,8 @@ const CONFIG_NAMES = ["oya.config.ts", "oya.config.mts", "oya.config.js", "oya.c
 
 const EXAMPLE = `Create an oya.config.ts in this folder:
 
-  import { Agent } from "oya";
-  import { anthropic } from "oya/anthropic";
+  import { Agent } from "oyadotai";
+  import { anthropic } from "oyadotai/anthropic";
 
   export default {
     agents: {

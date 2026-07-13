@@ -1,7 +1,7 @@
 /** The oya runner — plan-don't-react, real Anthropic usage from result.usage. */
 
-import { Agent, createTool } from "oya";
-import { anthropic } from "oya/anthropic";
+import { Agent, createTool } from "oyadotai";
+import { anthropic } from "oyadotai/anthropic";
 import { z } from "zod";
 
 import type { Metrics } from "./metrics.js";

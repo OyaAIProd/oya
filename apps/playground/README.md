@@ -15,8 +15,8 @@ Agents live in [`lib/agents.ts`](./lib/agents.ts). Add an entry to the exported
 `POST /api/run { agent, prompt }`:
 
 ```ts
-import { Agent, createTool } from "oya";
-import { anthropic } from "oya/anthropic";
+import { Agent, createTool } from "oyadotai";
+import { anthropic } from "oyadotai/anthropic";
 import { z } from "zod";
 
 const lookup = createTool({
@@ -48,5 +48,5 @@ demo agents fall back to canned local models so the studio still runs.
 ## How a request flows
 
 `app/page.tsx` (client) → `POST /api/run` → [`app/api/run/route.ts`] →
-`agent.stream(prompt)` → `toSSEResponse` from `@oya/server` → the client renders
+`agent.stream(prompt)` → `toSSEResponse` from `oyadotai-server` → the client renders
 the structured events (`oya/react`'s `applyEvent`) into the DAG + chat.

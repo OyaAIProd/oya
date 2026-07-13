@@ -1,7 +1,7 @@
 /**
  * The Google (Gemini) provider — `oya/google`.
  *
- *     import { google } from "oya/google";
+ *     import { google } from "oyadotai/google";
  *     const agent = new Agent({ model: google("gemini-2.5-pro"), tools });
  *
  * No SDK dependency: talks to the Generative Language API over `fetch`. Reads

@@ -3,7 +3,7 @@
 ## Install
 
 ```bash
-bun add oya zod
+bun add oyadotai zod
 ```
 
 ## Your first agent
@@ -11,8 +11,8 @@ bun add oya zod
 The API mirrors Mastra (`createTool` + `Agent.generate`):
 
 ```ts
-import { Agent, createTool } from "oya";
-import { anthropic } from "oya/anthropic";
+import { Agent, createTool } from "oyadotai";
+import { anthropic } from "oyadotai/anthropic";
 import { z } from "zod";
 
 const getWeather = createTool({
@@ -63,7 +63,7 @@ You can construct and execute a plan against a `Catalog` of skills with no model
 in the loop — useful for tests and for understanding the runtime:
 
 ```ts
-import { Catalog, Executor, Plan, Handle, Projection, SkillNode } from "oya";
+import { Catalog, Executor, Plan, Handle, Projection, SkillNode } from "oyadotai";
 
 const cat = new Catalog();
 cat.register({
@@ -94,7 +94,7 @@ check → execute, with automatic re-emit on a bad plan and replan on a runtime
 failure:
 
 ```ts
-import { Planner } from "oya";
+import { Planner } from "oyadotai";
 
 const planner = new Planner(catalog, llmClient);
 const result = await planner.run("Follow up with the lead at https://example.io/leads/abc123");

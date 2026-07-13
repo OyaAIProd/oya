@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { applyEvent, initialPlanState, type NodeState, type PlanState } from "oya/react";
-import type { OyaEvent } from "oya";
+import { applyEvent, initialPlanState, type NodeState, type PlanState } from "oyadotai/react";
+import type { OyaEvent } from "oyadotai";
 
 import { Dag, type RawPlan } from "../components/Dag";
 

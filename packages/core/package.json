@@ -1,9 +1,12 @@
 {
-  "name": "oya",
+  "name": "oyadotai",
   "version": "0.1.0",
   "description": "A plan-don't-react framework for LLM agents. The model emits a typed dataflow plan once; the runtime executes it; the model never reads state it shouldn't.",
   "license": "MIT",
   "author": "Oya Labs, Inc.",
+  "repository": { "type": "git", "url": "git+https://github.com/OyaAIProd/oya.git", "directory": "packages/core" },
+  "homepage": "https://github.com/OyaAIProd/oya#readme",
+  "bugs": { "url": "https://github.com/OyaAIProd/oya/issues" },
   "type": "module",
   "sideEffects": false,
   "engines": { "node": ">=18" },

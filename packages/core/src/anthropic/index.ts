@@ -1,7 +1,7 @@
 /**
  * The Anthropic provider — `oya/anthropic`.
  *
- *     import { anthropic } from "oya/anthropic";
+ *     import { anthropic } from "oyadotai/anthropic";
  *     const agent = new Agent({ model: anthropic("claude-haiku-4-5-20251001"), skills });
  *
  * No SDK dependency: it talks to the Messages API over `fetch` (Node 18+). Reads

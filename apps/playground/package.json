@@ -11,9 +11,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@oya/server": "workspace:*",
+    "oyadotai-server": "workspace:*",
     "next": "^15.1.0",
-    "oya": "workspace:*",
+    "oyadotai": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "zod": "^3.23.8"

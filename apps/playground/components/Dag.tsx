@@ -1,6 +1,6 @@
 "use client";
 
-import type { NodeState } from "oya/react";
+import type { NodeState } from "oyadotai/react";
 
 type RawNode = { id: string; kind: string; skill?: string; inputs?: unknown; outputs?: string[] };
 export type RawPlan = { nodes: RawNode[] };
