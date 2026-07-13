@@ -178,14 +178,30 @@ instead of looping — so a migrated app gets the numbers above for free.
 
 Chat with your agents and watch each plan execute live — the DAG, the trace, and
 every value at its projection level (`OPAQUE` shows nothing, `TRANSPARENT` shows
-the value). In your project:
+the value). Studio opens at http://localhost:4000.
+
+**In this repo** — two ways, both zero-setup (a sample [`oya.config.ts`](./oya.config.ts) is included):
+
+```bash
+make dev                              # the full playground UI (builds libs, then runs it)
+bun run build && bunx oyadotai dev    # the lightweight CLI Studio, serving oya.config.ts
+```
+
+**In your own project** — add an `oya.config.ts` that exports your agents, then `bunx oyadotai dev`:
 
 ```ts
 // oya.config.ts
-export default { agents: { support } };
+import { Agent, createTool } from "oyadotai";
+import { anthropic } from "oyadotai/anthropic";
+
+export default {
+  agents: {
+    support: new Agent({ model: anthropic("claude-haiku-4-5-20251001"), tools: { /* ...createTool(...) */ } }),
+  },
+};
 ```
 ```bash
-bunx oyadotai dev      # → oya Studio at localhost:4000
+bunx oyadotai dev      # → oya Studio at http://localhost:4000
 ```
 
 ## Use it anywhere
