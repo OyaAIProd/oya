@@ -45,10 +45,10 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: bun install --frozen-lockfile
 
+      # `npm version` cannot parse the `workspace:` protocol this repo uses, so bump
+      # the patch version by editing the version field directly.
       - name: Bump patch versions
-        run: |
-          (cd packages/core && npm version patch --no-git-tag-version)
-          (cd packages/server && npm version patch --no-git-tag-version)
+        run: node scripts/bump-patch.mjs
 
       - run: bun install            # sync bun.lock with the bumped versions
       - run: bun run build          # rebuild dist/ before publishing
