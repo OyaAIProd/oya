@@ -31,7 +31,7 @@ export async function runMastra(task: Task, modelId = "claude-haiku-4-5-20251001
   const latencyMs = performance.now() - start;
   const u = (result.usage ?? {}) as { inputTokens?: number; outputTokens?: number; promptTokens?: number; completionTokens?: number };
   const steps: any[] = result.steps ?? [];
-  const sequence = steps.flatMap((s) => (s.toolCalls ?? []).map((c: any) => c.toolName ?? "tool"));
+  const sequence = steps.flatMap((s) => (s.toolCalls ?? []).map((c: any) => c.payload?.toolName ?? c.toolName ?? "tool"));
   return {
     framework: "Mastra",
     roundTrips: steps.length || 0,

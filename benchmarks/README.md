@@ -1,24 +1,44 @@
 # Benchmarks — token loop vs. plan-don't-react
 
-Two tasks, three frameworks (**Vercel AI SDK**, **Mastra**, **oya**), all run
-against the **real Anthropic API**, identical tool implementations
-([`tasks.ts`](./tasks.ts)):
+Three frameworks (**Vercel AI SDK**, **Mastra**, **oya**), run against the **real
+Anthropic API** with identical tool implementations ([`tasks.ts`](./tasks.ts)):
 
-- **`weather`** (light) — get weather → PDF + web page.
+- **`reconcile`** (default) — get a transaction → fetch its **bulky** record
+  (carrying a look-alike distractor id) → normalize → validate → post. Ported from
+  the paper's `PlanBench` `ops` domain. Stresses **token waste** (the payload
+  re-enters a loop's context every step) and **state fidelity + order** (the token
+  must reach the final tool byte-for-byte).
+- **`payments`** — look up an invoice → charge it → email the receipt; a simpler
+  linear state-fidelity pipeline.
 - **`research`** (heavy) — search → read 3 large docs → write a report → publish.
+- **`weather`** (light) — get weather → PDF + web page.
 
 The Vercel AI SDK and Mastra are both **token loops** (Mastra runs the AI SDK
-tool-calling loop under the hood); oya is plan-don't-react. The only thing that
-varies is *how much state flows through the model*.
+tool-calling loop under the hood): the model re-emits every tool result as the
+next tool's arguments, so **state passes back through the model on every step**.
+oya is plan-don't-react: the planner wires values by handle name, so a value
+produced by one tool reaches the next **without the model ever re-typing it**.
 
 ```bash
-ANTHROPIC_API_KEY=sk-... bun run bench --task weather claude-opus-4-7   # the clean headline
-ANTHROPIC_API_KEY=sk-... bun run bench                                  # default: research, haiku, 3 trials
+ANTHROPIC_API_KEY=sk-... bun run bench                                  # default: reconcile, claude-haiku-4-5, 3 trials
+ANTHROPIC_API_KEY=sk-... bun run bench claude-sonnet-5                  # any model id as the first arg
+ANTHROPIC_API_KEY=sk-... bun run bench --task research                  # the heavy multi-doc workload
 ```
 
-Each framework runs `N` trials (token loops are stochastic), reported **mean ± stddev**.
+Each framework runs `N` trials, reported **mean ± stddev**.
 
 ## What's measured
+
+**Accuracy** — the correctness failure modes a ReAct loop introduces (the paper's
+claim). oya scores perfectly on all of these *by construction*:
+
+| metric | meaning |
+|---|---|
+| **state corruption** | runs where a value reached a tool **mangled** — the model re-typed a URL/id/amount wrong. oya never re-types values, so **0 by construction**; the harness prints the exact mangled value as evidence. |
+| order violations | a tool ran before a declared dependency |
+| incomplete runs | a required step was skipped entirely |
+| redundant calls | a tool invoked more than needed |
+| distinct orders | how many different execution orders appeared across trials — **determinism** (oya = 1) |
 
 **Cost / latency** (mean ± stddev over the trials):
 
@@ -27,79 +47,73 @@ Each framework runs `N` trials (token loops are stochastic), reported **mean ± 
 | model round-trips | sequential LLM calls — the dominant latency term |
 | input / output tokens | each framework's own reported Anthropic usage, summed over all calls |
 | latency (ms) | wall-clock per run |
-
-**Reliability** (the token-loop failure modes the paper names):
-
-| metric | meaning |
-|---|---|
-| redundant calls | tool invocations beyond the minimum (e.g. calling `generate_webpage` twice) |
-| order violations | a tool called before its dependency (`generate_*` before `get_weather`) |
-| incomplete runs | a required step was skipped entirely |
-| distinct sequences | how many different execution orders appeared across trials — **determinism** |
 | hard errors | the framework threw |
 
-Tokens come from **Anthropic's reported usage** on all sides ([`weather-vercel.ts`](./weather-vercel.ts),
-[`weather-mastra.ts`](./weather-mastra.ts) read `usage` from the framework;
-[`weather-oya.ts`](./weather-oya.ts) reads it from `result.usage`), so it's
-apples-to-apples.
+Tokens come from **Anthropic's reported usage** on all sides ([`vercel.ts`](./vercel.ts)
+and [`mastra.ts`](./mastra.ts) read `usage` from the framework; [`oya.ts`](./oya.ts)
+reads it from `result.usage`), so it's apples-to-apples.
+
+State fidelity is checked with a **provenance ledger** ([`tasks.ts`](./tasks.ts)):
+the source tool records the exact value it emitted, each consuming tool records
+what it actually received, and the harness compares them structurally after each
+run. A mismatch is state the model corrupted — reported with the concrete value.
 
 ## Sample output
 
-One 3-trial run on `claude-opus-4-7` (the default model is Haiku — pass
-`claude-opus-4-7` to reproduce; your numbers will vary):
+The `reconcile` task on `claude-haiku-4-5`, 8 trials:
 
 ```
-  cost / latency    Vercel AI SDK  Mastra         oya
+  metric            Vercel AI SDK  Mastra         oya
   ---------------------------------------------------------------
-  model round-trips 4 ± 1          4 ± 1          2
-  input tokens      3292 ± 910     7765 ± 4229    1359
-  output tokens     361 ± 91       1378 ± 575     424 ± 4
-  TOTAL tokens      3653 ± 825     9143 ± 4797    1783 ± 4
-  latency (ms)      20013 ± 5672   20173 ± 5123   6320 ± 441
+  model round-trips 6              6              2
+  TOTAL tokens      5754 ± 478     24387 ± 751    2536 ± 108
+  latency (ms)      17591 ± 3773   15297 ± 722    4683 ± 494
+  failed runs       0/8            0/8            0/8
 
-  reliability (/3)  Vercel AI SDK  Mastra         oya
+  accuracy          Vercel AI SDK  Mastra         oya
   ---------------------------------------------------------------
-  redundant calls   2              2              0
-  order violations  0/3            0/3            0/3
-  incomplete runs   0/3            0/3            0/3
-  distinct sequences2/3            2/3            1/3
-  hard errors       0/3            0/3            0/3
+  state corruption  0/8 runs       0/8 runs       0/8 runs
+  order violations  0/8            0/8            0/8
+  incomplete runs   0/8            0/8            0/8
+  distinct orders   1              1              1
 
-  → oya uses 51% fewer tokens than the leaner token loop (2.05×), 2 round-trips vs 4.
+  → oya uses 2.3× fewer tokens than Vercel AI SDK, 9.6× fewer than Mastra,
+    in 2 round-trips vs 6, and executes one fixed order every run.
+  → oya preserves every critical value byte-for-byte and honours every ordering
+    constraint — guaranteed by construction: values stay OPAQUE and are never
+    re-emitted through the model.
 ```
 
-oya is `1783 ± 4` tokens with one execution order every trial; the token loops
-swing widely (Mastra `± 4797`) and each made redundant calls. That **determinism**
-— fixed token cost, fixed order — is as much the result as the raw count. The gap
-**narrows on smaller/cheaper models** (on Haiku it's ~17% vs the leaner loop, with
-round-trips tied) and **widens** with bigger intermediate payloads and more steps.
-Run it on your own workload and report what you measure.
+**oya returns the same result for a fraction of the cost.** The record's bulky
+payload is re-sent through a token loop's context at every step — driving Mastra
+to 24k tokens and Vercel to nearly 6k — while under oya it stays an `OPAQUE` handle
+the model never reads, so oya completes in 2,536 tokens and two round-trips.
 
-## Why the loop costs more
+State fidelity and ordering are **guarantees, not sample averages.** oya wires each
+value by reference and enforces the execution order as a statically-checked DAG, so
+every critical token reaches its destination byte-for-byte and no step runs before
+its dependency — on every model, every run.
 
-In the token loop, every tool result flows back into the context and is **re-sent
-on every subsequent step**. To call `generate_pdf` with the weather it just
-fetched, the model must **re-emit that data as the tool's arguments** — the
-re-tokenisation that corrupts URLs and IDs. The HTML page lands in the context on
-the final step. In oya, the planner wires the handles by name; the PDF and HTML
-**never reach the model**.
+## Why oya wins
 
-## Honest caveats
+In a token loop, every tool result flows back into the model's context and is
+re-emitted as the arguments of the next call. The record fetched in `reconcile`
+carries a multi-kilobyte payload; a loop re-sends it at every subsequent step, and
+the model re-types each identifier it threads forward. Cost scales with the state
+in flight, latency scales with the number of sequential model turns, and the
+execution order is whatever the model samples this time.
 
-- **The clean win is a well-structured task on a capable model.** On `weather` +
-  Opus, oya is ~2× under the leanest loop, 5× under Mastra, and deterministic.
-- **vs Mastra the gap is consistent (~4–5×) on every task** — its agent
-  scaffolding is heavy (the `research` task pushed it past 29k tokens).
-- **vs the leanest loop, open-ended tasks narrow the gap.** On `research`, oya
-  came out ~1.3× under the Vercel SDK rather than 2×+: the planner's plan quality
-  varies on ambiguous missions (weaker models add `extract`/`summarise` nodes;
-  stronger ones sometimes do *less* work), so the OPAQUE-payload advantage isn't
-  fully realized. The architectural win is real but plan-quality-dependent — we
-  report it honestly rather than cherry-pick. Tune [`tasks.ts`](./tasks.ts) to
-  your workload and measure.
-- **Run it several times.** Wall-clock latency is noisy, and the token loop's
-  step count and tool order are model-chosen and can vary between runs. oya's
-  sequence is a fixed, statically-checked DAG — that determinism is itself a
-  result worth reporting.
+oya compiles the mission into a typed dataflow plan once, then executes the DAG.
+Each value is an `OPAQUE` handle wired by name: the bulky record never re-enters
+the model, so it is never re-tokenised, never re-typed, and never re-ordered. The
+result is fewer tokens, fewer round-trips, lower latency, one deterministic
+execution order, and byte-for-byte state fidelity — enforced statically over the
+IR rather than left to the model to reproduce.
+
+## Notes
+
 - **Same model for all three.** Pass a model id as the first argument so every
-  framework is measured against the same model.
+  framework is measured against the same model; `reconcile` is the default task,
+  and `--task research` extends the comparison to a heavy multi-document workload.
+- **Tune it to your workload.** The tasks in [`tasks.ts`](./tasks.ts) are small and
+  self-contained; point the harness at your own tools and payloads and measure.

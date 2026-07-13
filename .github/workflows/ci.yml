@@ -14,6 +14,58 @@ jobs:
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
+      - run: bun run build          # build first — dependents resolve oyadotai from dist/
       - run: bun run typecheck
       - run: bun test
-      - run: bun run build
+
+  # Every push to main that passes `build` cuts a new patch release of both
+  # libraries to npm's `latest` tag, then commits the version bump + tag back.
+  # The bump commit carries [skip ci] and is pushed with GITHUB_TOKEN, so it
+  # does not re-trigger this workflow (no publish loop).
+  publish:
+    needs: build
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      !contains(github.event.head_commit.message, '[skip ci]')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+      - run: bun install --frozen-lockfile
+
+      - name: Bump patch versions
+        run: |
+          (cd packages/core && npm version patch --no-git-tag-version)
+          (cd packages/server && npm version patch --no-git-tag-version)
+
+      - run: bun install            # sync bun.lock with the bumped versions
+      - run: bun run build          # rebuild dist/ before publishing
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          (cd packages/core && npm publish --access public)
+          (cd packages/server && npm publish --access public)
+
+      - name: Commit release + tag
+        run: |
+          VERSION=$(node -p "require('./packages/core/package.json').version")
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add packages/core/package.json packages/server/package.json bun.lock
+          git commit -m "release: v$VERSION [skip ci]"
+          git tag "v$VERSION"
+          git push --follow-tags

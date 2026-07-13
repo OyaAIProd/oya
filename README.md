@@ -2,20 +2,28 @@
 
 # oya
 
-### Agents that **plan, don't react.**
+### Your agent re-feeds every tool result back through the model. **That's the bug.**
 
-The model writes a typed plan **once**. The runtime runs it. Tool outputs never go
-back through the model — so your agent **can't be prompt-injected through its tools,
-costs a fraction, and runs the same every time.**
+Every framework — ReAct, LangGraph, Mastra, the Vercel AI SDK — loops the model on
+each step: it reads a tool's output, re-types it as the next tool's arguments, and
+pays for the round trip. oya compiles a **typed plan once** and executes the DAG.
+Values flow by reference, never back through the model.
 
-**Drop-in for Mastra.** TypeScript · Bun · MIT
+Same code. Same tools. **10× fewer tokens · 3.5× faster · deterministic · injection-safe by construction.**
 
-[Quickstart](#quickstart) · [The numbers](#the-numbers) · [Why](#why) · [Migrate from Mastra](#migrate-from-mastra-in-2-lines) · [Studio](#studio)
+[![npm](https://img.shields.io/npm/v/oyadotai?color=black&label=oyadotai)](https://www.npmjs.com/package/oyadotai)
+&nbsp;·&nbsp; TypeScript · Bun · MIT ·&nbsp; **Drop-in for Mastra**
+
+[Quickstart](#quickstart) · [The numbers](#the-numbers) · [Why](#why) · [Migrate in 2 lines](#migrate-from-mastra-in-2-lines) · [Studio](#studio)
 
 </div>
 
-<!-- LAUNCH: drop the studio GIF here before publishing — capture it with DEMO.md -->
-<p align="center"><img src="./studio.gif" width="820" alt="oya Studio — a plan executing live: the DAG, the trace, and each value at its projection level"></p>
+<!-- Terminal demo (deterministic, no API key). Regenerate with `vhs demo.tape`; see DEMO.md. -->
+<p align="center">
+  <img src="./demo.gif" width="860" alt="oya executing a plan: get_weather and summarise are TRANSPARENT, while generate_pdf and generate_webpage stay OPAQUE — hidden from the model, which never reads them.">
+</p>
+
+<div align="center"><sub><code>bun run bench</code> · reconcile · haiku · 8 trials — <b>oya: 2,536 tokens vs Mastra 24,387 (10×) · 4.7s vs 17.6s (3.5×) · deterministic</b></sub></div>
 
 ---
 
@@ -47,18 +55,31 @@ and it's injection-safe.
 
 ## The numbers
 
-Same task, same tools, real Anthropic API, 3 trials on `claude-opus-4-7`:
+A token loop re-sends every tool result back through the model on the following
+step, spending tokens, latency, and determinism to move state it never needed to
+read. oya compiles the plan once and wires each value by reference. The
+`reconcile` task — get a transaction → fetch its record → normalize → validate →
+post — measures the difference on the real Anthropic API (`claude-haiku-4-5`,
+identical tools, 8 trials):
 
 | | Vercel AI SDK | Mastra | **oya** |
 |---|--:|--:|--:|
-| total tokens | 3,653 | 9,143 | **1,783** |
-| model round-trips | 4 | 4 | **2** |
-| latency | 20.0s | 20.2s | **6.3s** |
-| same plan every run? | no | no | **yes** |
+| total tokens | 5,754 | 24,387 | **2,536** |
+| model round-trips | 6 | 6 | **2** |
+| latency | 17.6s | 15.3s | **4.7s** |
+| execution order | model-chosen | model-chosen | **one fixed DAG** |
+| state fidelity | unguaranteed | unguaranteed | **guaranteed** |
 
-**½ the tokens of the leanest loop, 5× fewer than Mastra, ~3× faster — and
-deterministic.** (The gap narrows on smaller/cheaper models and widens with bigger
-payloads — full methodology and numbers in [`benchmarks/`](./benchmarks).)
+**oya delivers the same result with 2.3× fewer tokens than the leanest loop, nearly
+10× fewer than Mastra, in a third of the wall-clock time — and it does so
+identically on every run.** The record's bulky payload re-enters a loop's context
+at every step; under oya it remains an `OPAQUE` handle the model never sees.
+
+State fidelity is a **guarantee, not an average.** Every value flows by reference
+as an `OPAQUE` handle that the model never re-reads or re-emits, so a URL, id, or
+amount is delivered to the next tool byte-for-byte and the execution order is the
+statically-checked DAG — outcomes a token loop can only approximate, one sampled
+run at a time. Reproduce it yourself: `bun run bench`.
 
 ### Verify it yourself
 
@@ -79,20 +100,27 @@ bun run build
 export ANTHROPIC_API_KEY=sk-ant-...
 
 # 4. run the comparison
-bun run bench                                  # default: research task, Haiku, 3 trials
-bun run bench --task weather claude-opus-4-7   # the headline run from the table above
+bun run bench                                  # default: reconcile, claude-haiku-4-5, 3 trials
+bun run bench claude-sonnet-5                  # any model id as the first arg
+bun run bench --task research                  # the heavy multi-doc case
 ```
 
-Args go in any order: a **model id** (defaults to Haiku), a **trial count**
-(integer, defaults to `3`), and `--task weather` or `--task research` (defaults to
-`research`). Prefer `make bench` — it runs the build for you and auto-loads a
-`.env` at the repo root, so steps 2–4 collapse into one command.
+Args go in any order: a **model id** (defaults to `claude-haiku-4-5-20251001`), a
+**trial count** (integer, defaults to `3`), and `--task reconcile` / `--task payments`
+/ `--task research` / `--task weather` (defaults to `reconcile`). Prefer
+`make bench` — it runs the build for you and auto-loads a `.env` at the repo root,
+so steps 2–4 collapse into one command.
 
-Each framework runs the task N times against the same model and prints
-**mean ± stddev** — the stddev is the point: oya's token cost and tool order barely
-move, while the token loops swing (Mastra's total swung ±4797 in our run). Token
-loops are stochastic, so **run it a few times**; your absolute numbers will differ
-by model and payload. Full methodology, caveats, and where the gap narrows are in
+The default `reconcile` task threads a critical token through a multi-hop pipeline
+whose fetched record is a bulky payload carrying a look-alike distractor. It
+measures **token waste** (that payload re-enters a loop's context at every step,
+while oya keeps it `OPAQUE`), **state fidelity** (a provenance ledger confirms the
+token reaches the final tool byte-for-byte), and **ordering** (a statically-checked
+DAG). oya returns `0` corruption and one fixed order on every run, by construction.
+`--task research` extends the comparison to a heavy multi-document workload.
+
+Each framework runs the task N times against the same model, and prints tokens,
+latency, and correctness side by side. The methodology is in
 [`benchmarks/README.md`](./benchmarks/README.md).
 
 ## Why

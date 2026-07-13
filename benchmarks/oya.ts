@@ -23,6 +23,11 @@ export async function runOya(task: Task, modelId = "claude-haiku-4-5-20251001"):
     instructions: "Use the tools to complete the task, then reply with a short summary.",
     model: anthropic(modelId),
     tools,
+    // Heavy multi-source tasks occasionally yield a plan that fails static checks
+    // (a mis-named handle); give the planner more repair attempts against the
+    // checker feedback before it gives up, so a stray bad emit doesn't fail the run.
+    maxEmitRetries: 4,
+    maxReplans: 4,
   });
   const start = performance.now();
   const res = await agent.generate(task.mission);

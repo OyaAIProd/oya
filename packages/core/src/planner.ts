@@ -201,13 +201,22 @@ export class Planner {
       const system = planningSystem(snapshot, priorErrors, this.instructions);
       const user = `Mission: "${mission}"\nEmit the Plan IR as a single JSON object.`;
       const raw = await this.ask(system, user);
-      const plan = this.materialise(raw, mission);
+      let plan: Plan;
+      try {
+        plan = this.materialise(raw, mission);
+      } catch (exc) {
+        // Malformed / truncated plan JSON: retry with the parse error fed back,
+        // same as a static-check failure — don't abort the whole run on one bad emit.
+        priorErrors = [`invalid_plan_json: ${errMessage(exc)}`];
+        result.emitRetries = attempt + 1;
+        continue;
+      }
       const fatal = fatalErrors(check(plan));
       if (fatal.length === 0) return plan;
       priorErrors = fatal.map((e) => `${e.code}: ${e.message}`);
       result.emitRetries = attempt + 1;
     }
-    throw new Error(`plan failed static checks after retries: ${JSON.stringify(priorErrors)}`);
+    throw new Error(`plan failed emit checks after retries: ${JSON.stringify(priorErrors)}`);
   }
 
   private async emitReplan(
@@ -298,41 +307,63 @@ function planningSystem(
     out: s.outputSig,
     ...(s.description ? { doc: s.description } : {}),
   }));
+  // The example deliberately mirrors a multi-source task (search -> fetch several
+  // pages -> combine -> report -> reply): that fan-in is exactly where naming
+  // consistency breaks down, so the model has a correct pattern to copy.
   const example = {
     plan_id: "example",
     handles: [
-      { name: "topic", type: "str", projection: "TRANSPARENT", origin: "n0" },
-      { name: "page", type: "str", projection: "OPAQUE", origin: "n1" },
-      { name: "report", type: "str", projection: "OPAQUE", origin: "n2" },
-      { name: "answer", type: "str", projection: "TRANSPARENT", origin: "n3" },
+      { name: "query", type: "str", projection: "TRANSPARENT", origin: "n0" },
+      { name: "hits", type: "json", projection: "OPAQUE", origin: "n1" },
+      { name: "page_1", type: "str", projection: "OPAQUE", origin: "n2" },
+      { name: "page_2", type: "str", projection: "OPAQUE", origin: "n3" },
+      { name: "report", type: "str", projection: "OPAQUE", origin: "n4" },
+      { name: "pdf", type: "str", projection: "OPAQUE", origin: "n5" },
+      { name: "answer", type: "str", projection: "TRANSPARENT", origin: "n6" },
     ],
     nodes: [
-      { id: "n0", kind: "extract", inputs: ["mission"], outputs: ["topic"] },
-      { id: "n1", kind: "skill", skill: "fetch_url@1", inputs: { url: "topic" }, outputs: ["page"] },
-      {
-        id: "n2",
-        kind: "skill",
-        skill: "make_pdf@1",
-        inputs: { content: "page" },
-        args: { action: "create", file_path: "report.pdf" },
-        outputs: ["report"],
-      },
-      { id: "n3", kind: "summarise", inputs: ["topic"], outputs: ["answer"] },
+      { id: "n0", kind: "extract", inputs: ["mission"], outputs: ["query"] },
+      { id: "n1", kind: "skill", skill: "search@1", inputs: { query: "query" }, outputs: ["hits"] },
+      { id: "n2", kind: "skill", skill: "fetch_url@1", inputs: { url: "hits" }, outputs: ["page_1"] },
+      { id: "n3", kind: "skill", skill: "fetch_url@1", inputs: { url: "hits" }, outputs: ["page_2"] },
+      { id: "n4", kind: "skill", skill: "make_report@1", inputs: { sources: "page_1" }, outputs: ["report"] },
+      { id: "n5", kind: "skill", skill: "make_pdf@1", inputs: { content: "report" }, outputs: ["pdf"] },
+      { id: "n6", kind: "summarise", inputs: ["query"], outputs: ["answer"] },
     ],
-    exits: ["answer", "report"],
+    exits: ["answer", "pdf"],
   };
   const parts = [
-    "You are a planner that emits ONE typed dataflow Plan IR as a JSON object. No prose.",
+    "You are a planner that emits ONE typed dataflow Plan IR as a JSON object. No prose, no markdown fences — start with { and end with }.",
+    // The wiring invariant — stated first and bluntly, because handle_undefined and
+    // handle_no_producer (mis-matched names) are the failures that abort plans.
+    "WIRING INVARIANT — the plan is a graph wired ONLY by handle NAMES, so names must " +
+      "match EXACTLY everywhere. (1) Every name you use in a node's 'inputs' MUST be the " +
+      "exact 'outputs' name of some EARLIER node — copy it character-for-character; never " +
+      "invent a new name on the consuming side, never reference a handle a node has not " +
+      "produced yet. (2) Every handle in the top-level 'handles' array is produced by " +
+      "exactly ONE node: its 'origin' is that node's id and the name appears in that " +
+      "node's 'outputs'. (3) Every name in any node's 'outputs' MUST also appear once in " +
+      "'handles'. If you write 'page_1' as an output, spell it 'page_1' in handles and in " +
+      "every consumer — not 'page1', 'source_1', or 'pages'. Before finishing, re-read the " +
+      "plan and confirm every inputs name resolves to an earlier outputs name.",
     "A skill node binds the skill's parameters two ways: 'inputs' = HANDLE references " +
       "(values PRODUCED by other nodes), 'args' = LITERAL constant values you supply " +
       "directly (strings/numbers/bools). Prefer the name-keyed form: " +
       '"inputs": {"<param>": "<handle>"} and "args": {"<param>": "<value>"}. Each ' +
-      "parameter is filled by EITHER inputs OR args, never both. NEVER put a literal " +
-      "value in 'inputs' (those are handle names, not values) and never put a handle " +
-      "name in 'args'. 'outputs' is an array of the handle names the node produces.",
+      "parameter is filled by EITHER inputs OR args, never both. Use ONLY parameter names " +
+      "that the skill declares in the catalogue below. NEVER put a literal value in " +
+      "'inputs' (those are handle names, not values) and never put a handle name in " +
+      "'args'. 'outputs' is an array of the handle names the node produces.",
     "Use kind 'skill' for EVERY catalogue skill below (deterministic). Use 'extract' " +
       "only to pull a value from a TRANSPARENT text input when NO catalogue skill does " +
       "it; 'summarise' only for a user-facing summary.",
+    // Minimality — cuts the extract->extract->extract noise and the token/round-trip
+    // variance it causes; also keeps the plan JSON short enough not to truncate.
+    "Emit the MINIMAL plan: the fewest nodes that satisfy the mission — ideally ONE node " +
+      "per catalogue action the mission names, plus one leading 'extract' only if a skill " +
+      "needs a value pulled from the mission text, plus the final 'summarise'. Do NOT add " +
+      "extra extract/summarise nodes, do NOT chain extract into extract, and do NOT " +
+      "re-fetch or re-process a value you already have as a handle.",
     "Plan ALL of the actions the mission asks for: if it requests several things, emit " +
       "a node for EACH one and list each result in 'exits'. Do not drop requested steps.",
     "ALWAYS end with a 'summarise' node that writes the final natural-language reply to " +
@@ -346,8 +377,8 @@ function planningSystem(
       "read. branch/for_each inputs must be >= SUMMARY; extract/summarise inputs must " +
       "be TRANSPARENT.",
     "origin is the id of the node that produces the handle.",
-    `Example plan: ${JSON.stringify(example)}`,
-    `Catalogue (use these exact name@version refs): ${JSON.stringify(skills)}`,
+    `Example plan (note how every inputs name matches an earlier outputs name exactly): ${JSON.stringify(example)}`,
+    `Catalogue (use these exact name@version refs and ONLY their declared parameter names): ${JSON.stringify(skills)}`,
   ];
   if (instructions) {
     parts.unshift(`Agent instructions (persona / guidance): ${instructions}`);
