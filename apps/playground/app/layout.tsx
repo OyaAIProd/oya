@@ -1,22 +1,19 @@
 import type { ReactNode } from "react";
+import { Inter, JetBrains_Mono } from "next/font/google";
+import "@xyflow/react/dist/style.css";
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono-jb", display: "swap" });
 
 export const metadata = {
   title: "oya studio",
-  description: "Plan-don't-react agent studio.",
+  description: "Plan-don't-react agent studio — watch each plan execute, every value at its projection level.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="en" className={`dark ${inter.variable} ${jetbrains.variable}`}>
       <body>{children}</body>
     </html>
   );

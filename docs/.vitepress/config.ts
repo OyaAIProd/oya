@@ -12,7 +12,12 @@ export default defineConfig({
     sidebar: [
       {
         text: "Guide",
-        items: [{ text: "Getting Started", link: "/guide/getting-started" }],
+        items: [
+          { text: "Getting Started", link: "/guide/getting-started" },
+          { text: "Creating an Agent", link: "/guide/creating-agents" },
+          { text: "Configuring the Sandbox", link: "/guide/sandbox" },
+          { text: "Studio", link: "/guide/studio" },
+        ],
       },
       {
         text: "Concepts",
@@ -22,7 +27,7 @@ export default defineConfig({
         ],
       },
     ],
-    socialLinks: [{ icon: "github", link: "https://github.com/oya-labs/oya" }],
+    socialLinks: [{ icon: "github", link: "https://github.com/OyaAIProd/oya" }],
     footer: {
       message: "Released under the MIT License.",
       copyright: "© 2026 Oya Labs, Inc.",

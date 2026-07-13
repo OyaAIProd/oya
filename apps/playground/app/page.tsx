@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { applyEvent, initialPlanState, type NodeState, type PlanState } from "oyadotai/react";
 import type { OyaEvent } from "oyadotai";
+import { ArrowUp, Boxes, GitFork } from "lucide-react";
+import clsx from "clsx";
 
 import { Dag, type RawPlan } from "../components/Dag";
 
@@ -39,6 +41,13 @@ const inputsOf = (n: { inputs?: unknown } | undefined): string[] => {
   if (!x) return [];
   if (Array.isArray(x)) return x.filter((h): h is string => typeof h === "string");
   return Object.values(x as Record<string, unknown>).filter((v): v is string => typeof v === "string");
+};
+
+const STATUS_STYLE: Record<string, string> = {
+  streaming: "text-brand bg-brand/15",
+  done: "text-transp bg-transp/15",
+  error: "text-danger bg-danger/15",
+  idle: "text-faint bg-surface2",
 };
 
 export default function Studio() {
@@ -132,139 +141,240 @@ export default function Studio() {
 
   const selNode: NodeState | undefined = view?.nodes.find((n) => n.nodeId === sel);
   const selRaw = (view?.plan as RawPlan | null)?.nodes?.find((n) => n.id === sel);
+  const status = view?.status ?? "idle";
 
   return (
-    <div className="app">
-      {/* sidebar */}
-      <aside className="col">
-        <div className="brand">
-          <span className="logo">
-            <b>oya</b> studio
+    <div className="grid h-screen" style={{ gridTemplateColumns: "244px 1fr 468px" }}>
+      {/* ── sidebar ─────────────────────────────────────────── */}
+      <aside className="glass flex min-h-0 flex-col border-r border-line">
+        <div className="flex items-baseline gap-2 border-b border-line px-5 py-4">
+          <span className="text-[22px] font-semibold tracking-tight">
+            <span className="text-brand">oya</span> studio
           </span>
-          <span className="tag">plan, don&apos;t react</span>
+          <span className="text-[11px] italic text-faint">plan, don&apos;t react</span>
         </div>
-        <div className="navsec">Agents</div>
-        {agents.map((a) => (
-          <div
-            key={a}
-            className={"item" + (a === agent ? " on" : "")}
-            onClick={() => {
-              setAgent(a);
-              setSelRun(null);
-              setLive(initialPlanState);
-            }}
-          >
-            <span className="pip" />
-            <span className="mono">{a}</span>
-            {runs.filter((r) => r.agent === a).length > 0 && (
-              <span className="sub">{runs.filter((r) => r.agent === a).length}</span>
-            )}
-          </div>
-        ))}
-        <div className="navsec">Runs</div>
-        {runs.length === 0 && <div className="item"><span className="mono" style={{ color: "var(--faint)" }}>no runs yet</span></div>}
-        {[...runs].reverse().map((r) => (
-          <div key={r.id} className={"runrow" + (selRun === r.id ? " on" : "")} onClick={() => { setSelRun(r.id); setSel(null); setTab("graph"); }}>
-            <div className="t">{r.prompt}</div>
-            <div className="m">
-              <span>{r.agent}</span>
-              <span>{r.nodes.length} nodes</span>
-              <span>{r.usage ? r.usage.inputTokens + r.usage.outputTokens : 0} tok</span>
-            </div>
-          </div>
-        ))}
-        <div className="spacer" />
-        <div className="foot">oya studio · local</div>
+
+        <div className="scrollbar-thin flex-1 overflow-auto py-2">
+          <div className="mono px-4 pb-1 pt-3 text-[10px] uppercase tracking-[0.18em] text-faint">Agents</div>
+          {agents.map((a) => (
+            <button
+              key={a}
+              onClick={() => {
+                setAgent(a);
+                setSelRun(null);
+                setLive(initialPlanState);
+              }}
+              className={clsx(
+                "mx-2 flex w-[calc(100%-16px)] items-center gap-2.5 rounded-lg px-3 py-2 text-left transition-colors",
+                a === agent ? "bg-brand/15 text-fg ring-1 ring-brand/40" : "text-muted hover:bg-surface2 hover:text-fg",
+              )}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-brand shadow-[0_0_8px_var(--color-brand)]" />
+              <span className="mono flex-1 text-[12px]">{a}</span>
+              {runs.filter((r) => r.agent === a).length > 0 && (
+                <span className="mono text-[11px] text-faint">{runs.filter((r) => r.agent === a).length}</span>
+              )}
+            </button>
+          ))}
+
+          <div className="mono px-4 pb-1 pt-5 text-[10px] uppercase tracking-[0.18em] text-faint">Runs</div>
+          {runs.length === 0 && <div className="mono px-4 py-1 text-[12px] text-faint">no runs yet</div>}
+          {[...runs].reverse().map((r) => (
+            <button
+              key={r.id}
+              onClick={() => {
+                setSelRun(r.id);
+                setSel(null);
+                setTab("graph");
+              }}
+              className={clsx(
+                "mx-2 flex w-[calc(100%-16px)] flex-col gap-1 rounded-lg border px-3 py-2 text-left transition-colors",
+                selRun === r.id ? "border-line bg-surface2" : "border-transparent hover:bg-surface2",
+              )}
+            >
+              <span className="truncate text-[13px] text-fg">{r.prompt}</span>
+              <span className="mono flex gap-3 text-[10px] text-faint">
+                <span>{r.agent}</span>
+                <span className="inline-flex items-center gap-1">
+                  <GitFork size={10} /> {r.nodes.length}
+                </span>
+                <span>{r.usage ? r.usage.inputTokens + r.usage.outputTokens : 0} tok</span>
+              </span>
+            </button>
+          ))}
+        </div>
+        <div className="mono border-t border-line px-4 py-3 text-[10px] text-faint">oya studio · local</div>
       </aside>
 
-      {/* chat */}
-      <main className="col">
-        <div className="chead">
-          <span className="nm">{agent || "—"}</span>
-          <span className="ds">plan-don&apos;t-react agent</span>
+      {/* ── chat ────────────────────────────────────────────── */}
+      <main className="flex min-h-0 flex-col">
+        <div className="flex items-center gap-3 border-b border-line px-6 py-4">
+          <Boxes size={18} className="text-brand" />
+          <span className="text-[17px] font-semibold">{agent || "—"}</span>
+          <span className="text-[12px] text-muted">plan-don&apos;t-react agent</span>
         </div>
-        <div className="scroll" ref={chatRef}>
+        <div ref={chatRef} className="scrollbar-thin flex-1 overflow-auto px-6 pb-3 pt-6">
           {msgs.length === 0 ? (
-            <div className="empty">
-              <h1>{agent}</h1>
-              <div>Ask it something — you&apos;ll see the plan execute on the right, every value disclosed only at its projection level.</div>
-              <div className="suggest">
+            <div className="mx-auto mt-[14vh] max-w-lg text-center text-muted">
+              <h1 className="mb-2 text-[30px] font-semibold text-fg">{agent}</h1>
+              <p className="text-[14px] leading-relaxed">
+                Ask it something — you&apos;ll see the plan execute on the right, every value disclosed only at its
+                projection level.
+              </p>
+              <div className="mt-5 flex flex-wrap justify-center gap-2">
                 {["How's the weather in NYC?", "Summarize a page and make a PDF"].map((t) => (
-                  <div key={t} className="chip" onClick={() => void send(t)}>{t}</div>
+                  <button
+                    key={t}
+                    onClick={() => void send(t)}
+                    className="rounded-full border border-line px-3.5 py-1.5 text-[13px] text-muted transition-colors hover:border-brand hover:text-fg"
+                  >
+                    {t}
+                  </button>
                 ))}
               </div>
             </div>
           ) : (
             msgs.map((m, i) => (
-              <div key={i} className={"msg " + (m.role === "user" ? "user" : "bot")}>
-                <div className="who">{m.role === "user" ? "you" : "oya"}</div>
-                <div className="body">{m.content || (busy && i === msgs.length - 1 ? "…" : "")}</div>
+              <div key={i} className="mx-auto mb-5 flex max-w-3xl gap-3">
+                <div
+                  className={clsx(
+                    "mono mt-0.5 grid h-6 w-6 flex-none place-items-center rounded-md text-[11px] font-bold",
+                    m.role === "user" ? "bg-surface2 text-muted" : "bg-brand text-brand-fg",
+                  )}
+                >
+                  {m.role === "user" ? "you" : "◆"}
+                </div>
+                <div className="flex-1 whitespace-pre-wrap leading-relaxed">
+                  {m.content || (busy && i === msgs.length - 1 ? <span className="text-faint">…</span> : "")}
+                </div>
               </div>
             ))
           )}
         </div>
-        <div className="composer">
-          <div className="box">
-            <textarea ref={inputRef} rows={1} placeholder="Message the agent…" onKeyDown={onKey} />
-            <button className="send" disabled={busy} onClick={() => { const v = inputRef.current?.value ?? ""; if (inputRef.current) inputRef.current.value = ""; void send(v); }}>↑</button>
+        <div className="border-t border-line px-6 pb-5 pt-3.5">
+          <div className="mx-auto flex max-w-3xl items-end gap-2.5 rounded-2xl border border-line bg-surface px-4 py-2 focus-within:border-brand/60">
+            <textarea
+              ref={inputRef}
+              rows={1}
+              placeholder="Message the agent…"
+              onKeyDown={onKey}
+              className="max-h-40 flex-1 resize-none bg-transparent py-1.5 text-fg outline-none placeholder:text-faint"
+            />
+            <button
+              disabled={busy}
+              onClick={() => {
+                const v = inputRef.current?.value ?? "";
+                if (inputRef.current) inputRef.current.value = "";
+                void send(v);
+              }}
+              className="grid h-9 w-9 flex-none place-items-center rounded-xl bg-brand text-brand-fg transition-opacity hover:opacity-90 disabled:opacity-40"
+            >
+              <ArrowUp size={17} strokeWidth={2.5} />
+            </button>
           </div>
         </div>
       </main>
 
-      {/* dag / trace / io */}
-      <aside className="col">
-        <div className="rhead">
-          <div className="rtitle">
-            <span className="t">Run</span>
-            <span className={"status " + (view?.status ?? "idle")}>{view?.status ?? "idle"}</span>
+      {/* ── graph / trace / io ──────────────────────────────── */}
+      <aside className="glass flex min-h-0 flex-col border-l border-line">
+        <div className="border-b border-line px-4 pt-3.5">
+          <div className="mb-2.5 flex items-center gap-2">
+            <span className="mono text-[10px] uppercase tracking-[0.18em] text-faint">Run</span>
+            <span className={clsx("mono ml-auto rounded-full px-2 py-0.5 text-[10px] font-semibold", STATUS_STYLE[status] ?? STATUS_STYLE.idle)}>
+              {status}
+            </span>
           </div>
-          <div className="tabs">
+          <div className="flex gap-1">
             {(["graph", "trace", "io"] as const).map((t) => (
-              <div key={t} className={"tab" + (tab === t ? " on" : "")} onClick={() => setTab(t)}>{t === "io" ? "I/O" : t[0].toUpperCase() + t.slice(1)}</div>
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={clsx(
+                  "mono border-b-2 px-3 py-2 text-[11px] font-semibold transition-colors",
+                  tab === t ? "border-brand text-fg" : "border-transparent text-faint hover:text-muted",
+                )}
+              >
+                {t === "io" ? "I/O" : t[0].toUpperCase() + t.slice(1)}
+              </button>
             ))}
           </div>
         </div>
-        <div className="rbody">
+
+        <div className="relative min-h-0 flex-1">
           {!view || !view.plan ? (
-            <div className="muted">Run an agent to see its plan execute here.</div>
+            <div className="p-6 text-center text-[13px] text-faint">Run an agent to see its plan execute here.</div>
           ) : tab === "graph" ? (
-            <div className="pane">
-              <Dag plan={view.plan as RawPlan} nodes={view.nodes} selected={sel} onSelect={(id) => { setSel(id); setTab("io"); }} />
-              {view.text && <div className="answer">{view.text}</div>}
+            <div className="flex h-full flex-col">
+              <div className="min-h-0 flex-1">
+                <Dag
+                  plan={view.plan as RawPlan}
+                  nodes={view.nodes}
+                  selected={sel}
+                  onSelect={(id) => {
+                    setSel(id);
+                    setTab("io");
+                  }}
+                />
+              </div>
+              {view.text && (
+                <div className="scrollbar-thin max-h-[38%] overflow-auto border-t border-line p-4 text-[13px] leading-relaxed text-fg">
+                  {view.text}
+                </div>
+              )}
             </div>
           ) : tab === "trace" ? (
-            <div className="pane log">
+            <div className="scrollbar-thin mono h-full overflow-auto p-4 text-[12px] leading-7">
               {view.events.map((e, i) => (
                 <div key={i}>
-                  <span className="ts">{e.type}</span>
-                  {"nodeId" in e ? <> <b>{(e as { nodeId: string }).nodeId}</b></> : null}
-                  {e.type === "text-delta" ? ' "' + e.delta + '"' : ""}
+                  <span className="text-faint">{e.type}</span>
+                  {"nodeId" in e ? <b className="text-fg"> {(e as { nodeId: string }).nodeId}</b> : null}
+                  {e.type === "text-delta" ? <span className="text-muted">{' "' + e.delta + '"'}</span> : ""}
                 </div>
               ))}
             </div>
           ) : (
-            <div className="pane">
+            <div className="scrollbar-thin h-full overflow-auto p-4">
               {!sel ? (
-                <div className="muted">Click a node in the Graph to inspect its inputs and outputs.</div>
+                <div className="text-center text-[13px] text-faint">Click a node in the Graph to inspect its inputs and outputs.</div>
               ) : (
                 <>
-                  <div className="navsec" style={{ padding: "0 0 8px" }}>Node {sel}{selRaw?.skill ? " · " + selRaw.skill : ""}</div>
-                  <div style={{ font: "600 10px 'JetBrains Mono'", color: "var(--faint)", margin: "10px 0 4px" }}>INPUTS</div>
-                  {inputsOf(selRaw).length === 0 && <div className="hrow"><span className="v hidden">none</span></div>}
-                  {inputsOf(selRaw).map((h) => <div key={h} className="hrow"><span className="nm">{h}</span></div>)}
-                  <div style={{ font: "600 10px 'JetBrains Mono'", color: "var(--faint)", margin: "16px 0 4px" }}>OUTPUTS</div>
-                  {!selNode?.handles && <div className="hrow"><span className="v hidden">— not produced —</span></div>}
-                  {selNode?.handles && Object.entries(selNode.handles).map(([k, h]) => {
-                    const hh = h as { projection?: string; value?: unknown; summary?: unknown };
-                    const lvl = hh.projection ?? "OPAQUE";
-                    const v = hh.value !== undefined ? JSON.stringify(hh.value, null, 1) : hh.summary !== undefined ? JSON.stringify(hh.summary) : null;
-                    return (
-                      <div key={k} className="hrow">
-                        <div><span className={"lvl " + lvl}>{lvl}</span><span className="nm">{k}</span></div>
-                        {v == null ? <div className="v hidden">hidden — OPAQUE, the model never saw this</div> : <div className="v">{v}</div>}
-                      </div>
-                    );
-                  })}
+                  <div className="mono pb-2 text-[10px] uppercase tracking-[0.18em] text-faint">
+                    Node {sel}
+                    {selRaw?.skill ? " · " + selRaw.skill : ""}
+                  </div>
+                  <div className="mono mb-1 mt-2.5 text-[10px] font-semibold text-faint">INPUTS</div>
+                  {inputsOf(selRaw).length === 0 && <div className="border-b border-line py-2 text-[12px] italic text-faint">none</div>}
+                  {inputsOf(selRaw).map((h) => (
+                    <div key={h} className="border-b border-line py-2">
+                      <span className="mono text-[12px] font-bold">{h}</span>
+                    </div>
+                  ))}
+                  <div className="mono mb-1 mt-4 text-[10px] font-semibold text-faint">OUTPUTS</div>
+                  {!selNode?.handles && <div className="border-b border-line py-2 text-[12px] italic text-faint">— not produced —</div>}
+                  {selNode?.handles &&
+                    Object.entries(selNode.handles).map(([k, h]) => {
+                      const hh = h as { projection?: string; value?: unknown; summary?: unknown };
+                      const lvl = hh.projection ?? "OPAQUE";
+                      const v =
+                        hh.value !== undefined
+                          ? JSON.stringify(hh.value, null, 1)
+                          : hh.summary !== undefined
+                            ? JSON.stringify(hh.summary)
+                            : null;
+                      return (
+                        <div key={k} className="border-b border-line py-2.5">
+                          <div className="flex items-center gap-2">
+                            <span className={`lvl lvl-${lvl}`}>{lvl}</span>
+                            <span className="mono text-[12px] font-bold">{k}</span>
+                          </div>
+                          {v == null ? (
+                            <div className="mono mt-1.5 text-[12px] italic text-faint">hidden — OPAQUE, the model never saw this</div>
+                          ) : (
+                            <div className="mono mt-1.5 whitespace-pre-wrap break-words text-[12px] leading-6 text-muted">{v}</div>
+                          )}
+                        </div>
+                      );
+                    })}
                 </>
               )}
             </div>

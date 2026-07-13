@@ -1,87 +1,155 @@
-:root{
-  --ink:#0a0c11; --panel:#0e1117; --panel2:#11151c; --line:#1b212c; --line2:#252c39;
-  --tx:#e9ebf2; --mut:#8a93a6; --faint:#5a6374;
-  --coral:#ff6a3d; --coral-dim:#ff6a3d33;
-  --opaque:#6b7380; --summary:#f5b740; --transp:#46d6a0;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0}
-body{
-  background:var(--ink);color:var(--tx);
-  font-family:"Hanken Grotesk",system-ui,sans-serif;font-size:14px;
-  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
-  background-size:34px 34px;background-position:-1px -1px;
-}
-.app{display:grid;grid-template-columns:236px 1fr 460px;height:100vh}
-.col{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line);background:rgba(10,12,17,.72);backdrop-filter:blur(6px)}
-.col:last-child{border-right:0;border-left:1px solid var(--line)}
-.brand{padding:18px 18px 14px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
-.brand .logo{font-family:"Instrument Serif",serif;font-size:30px;line-height:1}
-.brand .logo b{color:var(--coral);font-style:italic}
-.brand .tag{font-size:11px;color:var(--faint);font-style:italic;font-family:"Instrument Serif",serif}
-.navsec{padding:14px 12px 4px;font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
-.item{display:flex;align-items:center;gap:9px;margin:2px 8px;padding:8px 10px;border-radius:9px;cursor:pointer;color:var(--mut);transition:.12s}
-.item:hover{background:var(--panel2);color:var(--tx)}
-.item.on{background:var(--coral-dim);color:var(--tx);box-shadow:inset 0 0 0 1px #ff6a3d44}
-.item .pip{width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 8px var(--coral)}
-.item .mono{font-family:"JetBrains Mono",monospace;font-size:12px}
-.item .sub{margin-left:auto;font:500 11px "JetBrains Mono",monospace;color:var(--faint)}
-.runrow{display:flex;flex-direction:column;gap:2px;margin:2px 8px;padding:8px 10px;border-radius:9px;cursor:pointer;border:1px solid transparent}
-.runrow:hover{background:var(--panel2)} .runrow.on{border-color:var(--line2);background:var(--panel2)}
-.runrow .t{font-size:13px;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.runrow .m{font:500 10px "JetBrains Mono",monospace;color:var(--faint);display:flex;gap:8px}
-.spacer{flex:1}
-.foot{padding:12px 16px;border-top:1px solid var(--line);font:500 10px "JetBrains Mono",monospace;color:var(--faint)}
+@import "tailwindcss";
 
-.chead{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
-.chead .nm{font-family:"Instrument Serif",serif;font-size:24px}
-.chead .ds{font-size:12px;color:var(--mut)}
-.scroll{flex:1;overflow:auto;padding:22px 22px 8px}
-.msg{max-width:760px;margin:0 auto 18px;display:flex;gap:12px}
-.msg .who{flex:none;width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font:700 11px "JetBrains Mono",monospace;margin-top:2px}
-.msg.user .who{background:#1b2230;color:var(--mut)} .msg.bot .who{background:var(--coral);color:#1a0a05}
-.msg .body{flex:1;line-height:1.6;white-space:pre-wrap;cursor:default}
-.empty{max-width:520px;margin:12vh auto;text-align:center;color:var(--mut)}
-.empty h1{font-family:"Instrument Serif",serif;font-weight:400;font-size:34px;color:var(--tx);margin:0 0 6px}
-.suggest{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
-.chip{border:1px solid var(--line2);border-radius:20px;padding:7px 13px;cursor:pointer;font-size:13px;color:var(--mut)}
-.chip:hover{border-color:var(--coral);color:var(--tx)}
-.composer{padding:14px 22px 20px;border-top:1px solid var(--line)}
-.box{max-width:760px;margin:0 auto;display:flex;gap:10px;background:var(--panel);border:1px solid var(--line2);border-radius:14px;padding:8px 8px 8px 16px;align-items:flex-end}
-.box:focus-within{border-color:#ff6a3d66}
-textarea{flex:1;background:transparent;border:0;outline:0;color:var(--tx);font:inherit;resize:none;max-height:160px;padding:8px 0}
-.send{flex:none;width:38px;height:38px;border:0;border-radius:10px;background:var(--coral);color:#1a0a05;font-size:17px;cursor:pointer}
-.send:disabled{opacity:.4;cursor:default}
+/* ── design tokens (OKLCH, dark, signature blue @ hue 250) ─────────────────── */
+@theme {
+  --color-bg: oklch(0.1 0.005 250);
+  --color-surface: oklch(0.14 0.012 250);
+  --color-surface2: oklch(0.18 0.014 250);
+  --color-fg: oklch(0.98 0.002 250);
+  --color-muted: oklch(0.68 0.012 250);
+  --color-faint: oklch(0.52 0.012 250);
+  --color-line: oklch(0.28 0.012 250 / 0.55);
+  --color-brand: oklch(0.62 0.19 250);
+  --color-brand-fg: oklch(0.14 0.01 250);
 
-.rhead{padding:14px 16px 0;border-bottom:1px solid var(--line)}
-.rtitle{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.rtitle .t{font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
-.status{margin-left:auto;font:600 10px "JetBrains Mono",monospace;padding:3px 8px;border-radius:20px}
-.status.streaming{color:var(--coral);background:var(--coral-dim)} .status.done{color:var(--transp);background:#46d6a022} .status.idle{color:var(--faint);background:var(--panel2)} .status.error{color:#ff5d5d;background:#ff5d5d22}
-.tabs{display:flex;gap:2px}
-.tab{padding:8px 12px;font:600 11px "JetBrains Mono",monospace;color:var(--faint);cursor:pointer;border-bottom:2px solid transparent}
-.tab:hover{color:var(--mut)} .tab.on{color:var(--tx);border-bottom-color:var(--coral)}
-.rbody{flex:1;overflow:auto;position:relative}
-.pane{padding:16px}
-svg.dag{display:block}
-.edge{fill:none;stroke:var(--line2);stroke-width:1.5}
-.edge.live{stroke:var(--coral);stroke-width:2}
-.node rect{fill:var(--panel2);stroke:var(--line2);transition:.2s}
-.node .id{font:700 12px "JetBrains Mono",monospace;fill:var(--tx)}
-.node .knd{font:500 10px "JetBrains Mono",monospace;fill:var(--mut)}
-.node.pending rect{opacity:.55}
-.node.running rect{stroke:var(--coral);fill:#1a1410;filter:drop-shadow(0 0 10px var(--coral-dim))}
-.node.done rect{stroke:var(--transp)}
-.node.sel rect{stroke:#fff}
-.node{cursor:pointer}
-.ndot.pending{fill:var(--opaque)}.ndot.running{fill:var(--coral)}.ndot.done{fill:var(--transp)}
-.log{font:500 12px/1.7 "JetBrains Mono",monospace;white-space:pre-wrap}
-.log .ts{color:var(--faint)} .log b{color:var(--tx)}
-.lvl{font:700 9px "JetBrains Mono",monospace;letter-spacing:.06em;padding:2px 6px;border-radius:5px;margin-right:8px}
-.lvl.OPAQUE{background:#6b738022;color:var(--opaque)} .lvl.SUMMARY{background:#f5b74022;color:var(--summary)} .lvl.TRANSPARENT{background:#46d6a022;color:var(--transp)}
-.hrow{padding:9px 0;border-bottom:1px solid var(--line)}
-.hrow .nm{font:700 12px "JetBrains Mono",monospace}
-.hrow .v{margin-top:5px;font:500 12px/1.5 "JetBrains Mono",monospace;color:var(--mut);white-space:pre-wrap;word-break:break-word}
-.hrow .v.hidden{color:var(--faint);font-style:italic}
-.muted{color:var(--faint);padding:18px;text-align:center;font-size:13px}
-.answer{margin-top:16px;line-height:1.6;color:var(--tx);white-space:pre-wrap}
+  /* projection levels — oya's own semantics */
+  --color-opaque: oklch(0.62 0.02 250);
+  --color-summary: oklch(0.8 0.14 85);
+  --color-transp: oklch(0.78 0.15 165);
+  --color-danger: oklch(0.66 0.2 20);
+
+  --radius: 0.75rem;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-mono-jb), ui-monospace, "SF Mono", monospace;
+
+  --shadow-glow: 0 0 22px oklch(0.62 0.19 250 / 0.35);
+  --shadow-glow-green: 0 0 18px oklch(0.78 0.15 165 / 0.3);
+}
+
+* {
+  border-color: var(--color-line);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  /* subtle full-page mesh glow */
+  background-image:
+    radial-gradient(at 0% 0%, oklch(0.62 0.19 250 / 0.08) 0px, transparent 45%),
+    radial-gradient(at 100% 100%, oklch(0.62 0.19 290 / 0.06) 0px, transparent 45%);
+  background-attachment: fixed;
+}
+
+/* ── reusable surface treatments ──────────────────────────────────────────── */
+.glass {
+  background: oklch(0.14 0.012 250 / 0.72);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+.glow {
+  box-shadow: var(--shadow-glow);
+}
+.mono {
+  font-family: var(--font-mono);
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 999px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* projection badges */
+.lvl {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+.lvl-OPAQUE {
+  background: oklch(0.62 0.02 250 / 0.16);
+  color: var(--color-opaque);
+}
+.lvl-SUMMARY {
+  background: oklch(0.8 0.14 85 / 0.16);
+  color: var(--color-summary);
+}
+.lvl-TRANSPARENT {
+  background: oklch(0.78 0.15 165 / 0.16);
+  color: var(--color-transp);
+}
+
+/* ── React Flow theming ───────────────────────────────────────────────────── */
+.react-flow {
+  --xy-background-color: transparent;
+  --xy-edge-stroke-default: var(--color-line);
+  --xy-edge-stroke-selected: var(--color-brand);
+}
+.react-flow__attribution {
+  display: none;
+}
+.react-flow__handle {
+  width: 7px;
+  height: 7px;
+  background: var(--color-brand);
+  border: none;
+  opacity: 0.85;
+}
+.react-flow__edge-path {
+  stroke-width: 1.6;
+}
+.react-flow__edge.animated .react-flow__edge-path {
+  stroke-dasharray: 5;
+  animation: dashflow 0.6s linear infinite;
+}
+@keyframes dashflow {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+.react-flow__controls {
+  background: oklch(0.14 0.012 250 / 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: none;
+}
+.react-flow__controls-button {
+  background: transparent;
+  border-bottom: 1px solid var(--color-line);
+  color: var(--color-muted);
+  fill: var(--color-muted);
+}
+.react-flow__controls-button:hover {
+  background: var(--color-surface2);
+  color: var(--color-fg);
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 oklch(0.62 0.19 250 / 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 6px oklch(0.62 0.19 250 / 0);
+  }
+}
+.animate-breathe {
+  animation: breathe 1.8s ease-in-out infinite;
+}
