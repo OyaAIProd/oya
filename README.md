@@ -23,7 +23,7 @@ Same code. Same tools. **10× fewer tokens · 3.5× faster · deterministic · i
   <img src="./demo.gif" width="860" alt="oya executing a plan: get_weather and summarise are TRANSPARENT, while generate_pdf and generate_webpage stay OPAQUE — hidden from the model, which never reads them.">
 </p>
 
-<div align="center"><sub><code>bun run bench</code> · reconcile · haiku · 8 trials — <b>oya: 2,536 tokens vs Mastra 24,387 (10×) · 4.7s vs 17.6s (3.5×) · deterministic</b></sub></div>
+<div align="center"><sub>Run it yourself in ~5s, no API key: <code>make install && make demo</code></sub></div>
 
 ---
 
@@ -213,12 +213,20 @@ bun add oyadotai zod
 
 ## Develop
 
+Everything runs through the [`Makefile`](./Makefile) — no need to remember package
+paths. Run `make help` to list every target.
+
 ```bash
-make dev        # oya Studio
+make install    # install all workspace dependencies
+make demo       # ▶  the paced terminal demo — no API key, ~5s (the GIF above)
+make dev        # oya Studio (the playground) at http://localhost:4000
+make example    # run the weather example end-to-end (no network)
+make bench      # live benchmark vs Vercel AI SDK + Mastra (needs ANTHROPIC_API_KEY)
 make test       # bun:test — checked against the Python reference runtime
-make bench      # the comparison
-make check      # typecheck + test, every package
+make check      # typecheck + test, every package (exactly what CI runs)
 ```
+
+New here? `make install && make demo` shows the whole idea in five seconds.
 
 oya is the TypeScript implementation of *Plan, Don't React: Projection Types for LLM
 Agent Runtimes*.
