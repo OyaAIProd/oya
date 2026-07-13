@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { applyEvent, initialPlanState, type NodeState, type PlanState } from "../src/react/index.js";
 import type { OyaEvent } from "../src/stream.js";
 import { Dag, type RawPlan } from "./Dag";
+import { Markdown } from "./Markdown";
 
 type Msg = { role: "user" | "bot"; content: string };
 type Usage = { inputTokens: number; outputTokens: number; modelCalls: number };
@@ -240,8 +241,18 @@ export function Studio() {
                 >
                   {m.role === "user" ? "you" : "◆"}
                 </div>
-                <div className="flex-1 whitespace-pre-wrap leading-relaxed">
-                  {m.content || (busy && i === msgs.length - 1 ? <span className="text-faint">…</span> : "")}
+                <div className="min-w-0 flex-1 leading-relaxed">
+                  {m.content ? (
+                    m.role === "bot" ? (
+                      <Markdown text={m.content} />
+                    ) : (
+                      <div className="whitespace-pre-wrap">{m.content}</div>
+                    )
+                  ) : busy && i === msgs.length - 1 ? (
+                    <span className="text-faint">…</span>
+                  ) : (
+                    ""
+                  )}
                 </div>
               </div>
             ))
@@ -312,7 +323,9 @@ export function Studio() {
                 />
               </div>
               {view.text && (
-                <div className="scrollbar-thin max-h-[38%] overflow-auto border-t border-line p-4 text-[13px] leading-relaxed text-fg">{view.text}</div>
+                <div className="scrollbar-thin max-h-[38%] overflow-auto border-t border-line p-4 text-[13px] leading-relaxed text-fg">
+                  <Markdown text={view.text} />
+                </div>
               )}
             </div>
           ) : tab === "trace" ? (

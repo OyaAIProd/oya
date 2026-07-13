@@ -14,7 +14,7 @@ Same code. Same tools. **10× fewer tokens · 3.5× faster · deterministic · i
 [![npm](https://img.shields.io/npm/v/oyadotai?color=black&label=oyadotai)](https://www.npmjs.com/package/oyadotai)
 &nbsp;·&nbsp; TypeScript · Bun · MIT ·&nbsp; **Drop-in for Mastra**
 
-[Quickstart](#quickstart) · [The numbers](#the-numbers) · [Why](#why) · [Migrate in 2 lines](#migrate-from-mastra-in-2-lines) · [Studio](#studio)
+[Quickstart](#quickstart) · [The numbers](#the-numbers) · [Why](#why) · [Migrate in 2 lines](#migrate-from-mastra-in-2-lines) · [Studio](#studio) · [Docs](#documentation)
 
 </div>
 
@@ -213,6 +213,20 @@ Bun server, a worker, the edge — `await agent.generate(prompt)`. Stream it wit
 `agent.stream(prompt)` (structured events, not a token soup) and render it with
 `oya/react`'s `usePlan` / `useChat`, or serve SSE with `oyadotai-server`. Managed
 hosting (Oya Cloud) is coming.
+
+## Documentation
+
+Full docs live in [`docs/`](./docs) (served locally with `make docs`):
+
+**Guide**
+- [Getting Started](./docs/guide/getting-started.md) — install and write your first agent
+- [Creating an Agent](./docs/guide/creating-agents.md) — tools, instructions, and the plan-once model
+- [Configuring the Sandbox](./docs/guide/sandbox.md) — where and how each tool's `execute` runs
+- [Studio](./docs/guide/studio.md) — chat with your agents and watch the plan execute live
+
+**Concepts**
+- [Projection Types](./docs/concepts/projection-types.md) — the `OPAQUE` / `SUMMARY` / `TRANSPARENT` lattice, and why it closes prompt injection at the root
+- [The Plan IR](./docs/concepts/plan-ir.md) — the typed dataflow graph the planner emits and the runtime executes
 
 ## Install
 
