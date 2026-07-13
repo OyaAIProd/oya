@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+/* ── design tokens (OKLCH, dark, signature blue @ hue 250) ─────────────────── */
+@theme {
+  --color-bg: oklch(0.1 0.005 250);
+  --color-surface: oklch(0.14 0.012 250);
+  --color-surface2: oklch(0.18 0.014 250);
+  --color-fg: oklch(0.98 0.002 250);
+  --color-muted: oklch(0.68 0.012 250);
+  --color-faint: oklch(0.52 0.012 250);
+  --color-line: oklch(0.28 0.012 250 / 0.55);
+  --color-brand: oklch(0.62 0.19 250);
+  --color-brand-fg: oklch(0.14 0.01 250);
+
+  --color-opaque: oklch(0.62 0.02 250);
+  --color-summary: oklch(0.8 0.14 85);
+  --color-transp: oklch(0.78 0.15 165);
+  --color-danger: oklch(0.66 0.2 20);
+
+  --radius: 0.75rem;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+  --shadow-glow: 0 0 22px oklch(0.62 0.19 250 / 0.35);
+}
+
+* {
+  border-color: var(--color-line);
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(at 0% 0%, oklch(0.62 0.19 250 / 0.08) 0px, transparent 45%),
+    radial-gradient(at 100% 100%, oklch(0.62 0.19 290 / 0.06) 0px, transparent 45%);
+  background-attachment: fixed;
+}
+
+.glass {
+  background: oklch(0.14 0.012 250 / 0.72);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+.glow {
+  box-shadow: var(--shadow-glow);
+}
+.mono {
+  font-family: var(--font-mono);
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 999px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.lvl {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+.lvl-OPAQUE {
+  background: oklch(0.62 0.02 250 / 0.16);
+  color: var(--color-opaque);
+}
+.lvl-SUMMARY {
+  background: oklch(0.8 0.14 85 / 0.16);
+  color: var(--color-summary);
+}
+.lvl-TRANSPARENT {
+  background: oklch(0.78 0.15 165 / 0.16);
+  color: var(--color-transp);
+}
+
+/* ── React Flow theming ───────────────────────────────────────────────────── */
+.react-flow {
+  --xy-background-color: transparent;
+  --xy-edge-stroke-default: var(--color-line);
+  --xy-edge-stroke-selected: var(--color-brand);
+}
+.react-flow__attribution {
+  display: none;
+}
+.react-flow__handle {
+  width: 7px;
+  height: 7px;
+  background: var(--color-brand);
+  border: none;
+  opacity: 0.85;
+}
+.react-flow__edge-path {
+  stroke-width: 1.6;
+}
+.react-flow__edge.animated .react-flow__edge-path {
+  stroke-dasharray: 5;
+  animation: dashflow 0.6s linear infinite;
+}
+@keyframes dashflow {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+.react-flow__controls {
+  background: oklch(0.14 0.012 250 / 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: none;
+}
+.react-flow__controls-button {
+  background: transparent;
+  border-bottom: 1px solid var(--color-line);
+  color: var(--color-muted);
+  fill: var(--color-muted);
+}
+.react-flow__controls-button:hover {
+  background: var(--color-surface2);
+  color: var(--color-fg);
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 oklch(0.62 0.19 250 / 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 6px oklch(0.62 0.19 250 / 0);
+  }
+}
+.animate-breathe {
+  animation: breathe 1.8s ease-in-out infinite;
+}

@@ -7,11 +7,14 @@
 
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { STUDIO_HTML } from "./studio-html.js";
 
 type Streamable = { stream: (p: string) => { fullStream: AsyncIterable<unknown> } };
+
+// The built Studio SPA (React Flow UI), emitted next to this file at dist/studio.
+const STUDIO_DIR = fileURLToPath(new URL("./studio", import.meta.url));
 
 const CONFIG_NAMES = ["oya.config.ts", "oya.config.mts", "oya.config.js", "oya.config.mjs"];
 
@@ -78,6 +81,12 @@ async function dev(argv: string[]) {
       const a = (agent && agents[agent]) || agents[names[0]];
       return sse(a.stream(prompt).fullStream);
     }
+    // Serve the built Studio SPA; fall back to the inline HTML if it isn't built.
+    const path = url.pathname === "/" || url.pathname.includes("..") ? "/index.html" : url.pathname;
+    const asset = Bun.file(STUDIO_DIR + path);
+    if (await asset.exists()) return new Response(asset);
+    const index = Bun.file(STUDIO_DIR + "/index.html");
+    if (await index.exists()) return new Response(index, { headers: { "content-type": "text/html; charset=utf-8" } });
     return new Response(STUDIO_HTML, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
   };
 

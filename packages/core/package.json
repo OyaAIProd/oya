@@ -24,7 +24,8 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && bun run build:studio",
+    "build:studio": "vite build --config studio/vite.config.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "example": "bun examples/weather-report.ts",
@@ -35,8 +36,17 @@
   "peerDependencies": { "react": "^18 || ^19" },
   "peerDependenciesMeta": { "react": { "optional": true } },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
     "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@xyflow/react": "^12.3.5",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
     "react": "^19.0.0",
-    "tsup": "^8.3.0"
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.0",
+    "tsup": "^8.3.0",
+    "vite": "^6.0.0"
   }
 }
