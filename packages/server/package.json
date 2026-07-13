@@ -1,6 +1,6 @@
 {
   "name": "oyadotai-server",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Fetch-API server helpers for oya agents (SSE / text streaming).",
   "license": "MIT",
   "author": "Oya Labs, Inc.",
