@@ -72,17 +72,21 @@ varies is how much state flows through the model.
 git clone https://github.com/OyaAIProd/oya && cd oya
 bun install
 
-# 2. give it your Anthropic key (env var, or drop it in a .env at the repo root)
+# 2. build the library — the benchmark imports the built `oyadotai` from dist/
+bun run build
+
+# 3. give it your Anthropic key (env var, or drop it in a .env at the repo root)
 export ANTHROPIC_API_KEY=sk-ant-...
 
-# 3. run the comparison
+# 4. run the comparison
 bun run bench                                  # default: research task, Haiku, 3 trials
 bun run bench --task weather claude-opus-4-7   # the headline run from the table above
 ```
 
 Args go in any order: a **model id** (defaults to Haiku), a **trial count**
 (integer, defaults to `3`), and `--task weather` or `--task research` (defaults to
-`research`). `make bench` does the same and auto-loads `.env`.
+`research`). Prefer `make bench` — it runs the build for you and auto-loads a
+`.env` at the repo root, so steps 2–4 collapse into one command.
 
 Each framework runs the task N times against the same model and prints
 **mean ± stddev** — the stddev is the point: oya's token cost and tool order barely
