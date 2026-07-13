@@ -144,11 +144,14 @@ export function Studio() {
   return (
     <div className="grid h-screen" style={{ gridTemplateColumns: "244px 1fr 468px" }}>
       <aside className="glass flex min-h-0 flex-col border-r border-line">
-        <div className="flex items-baseline gap-2 border-b border-line px-5 py-4">
-          <span className="text-[22px] font-semibold tracking-tight">
-            <span className="text-brand">oya</span> studio
+        <div className="flex items-center gap-2.5 border-b border-line px-5 py-4">
+          <svg width={22} height={22} viewBox="0 0 512 512" aria-hidden className="flex-none">
+            <circle cx="276" cy="276" r="160" fill="none" stroke="var(--color-brand)" strokeWidth={80} />
+            <circle cx="236" cy="236" r="160" fill="none" stroke="var(--color-fg)" strokeWidth={80} />
+          </svg>
+          <span className="text-[19px] font-semibold tracking-tight text-fg">
+            Oya <span className="font-normal text-muted">Studio</span>
           </span>
-          <span className="text-[11px] italic text-faint">plan, don&apos;t react</span>
         </div>
         <div className="scrollbar-thin flex-1 overflow-auto py-2">
           <div className="mono px-4 pb-1 pt-3 text-[10px] uppercase tracking-[0.18em] text-faint">Agents</div>
@@ -198,7 +201,7 @@ export function Studio() {
             </button>
           ))}
         </div>
-        <div className="mono border-t border-line px-4 py-3 text-[10px] text-faint">oya studio · local</div>
+        <div className="mono border-t border-line px-4 py-3 text-[10px] text-faint">Oya Studio · local</div>
       </aside>
 
       <main className="flex min-h-0 flex-col">

@@ -1,12 +1,12 @@
 <div align="center">
 
-# oya
+# Oya
 
 ### Your agent re-feeds every tool result back through the model. **That's the bug.**
 
 Every framework — ReAct, LangGraph, Mastra, the Vercel AI SDK — loops the model on
 each step: it reads a tool's output, re-types it as the next tool's arguments, and
-pays for the round trip. oya compiles a **typed plan once** and executes the DAG.
+pays for the round trip. Oya compiles a **typed plan once** and executes the DAG.
 Values flow by reference, never back through the model.
 
 Same code. Same tools. **10× fewer tokens · 3.5× faster · deterministic · injection-safe by construction.**
@@ -176,15 +176,17 @@ instead of looping — so a migrated app gets the numbers above for free.
 
 ## Studio
 
-Chat with your agents and watch each plan execute live — the DAG, the trace, and
-every value at its projection level (`OPAQUE` shows nothing, `TRANSPARENT` shows
-the value). Studio opens at http://localhost:4000.
+Chat with your agents and watch each plan execute live — the DAG (React Flow, nodes
+colored by kind and lit as they run), the trace, and every value at its projection
+level (`OPAQUE` shows nothing, `TRANSPARENT` shows the value). Studio opens at
+http://localhost:4000.
 
-**In this repo** — two ways, both zero-setup (a sample [`oya.config.ts`](./oya.config.ts) is included):
+**In this repo** — two ways, both zero-setup and both the same UI (a sample
+[`oya.config.ts`](./oya.config.ts) is included):
 
 ```bash
-make dev                              # the full playground UI (builds libs, then runs it)
-bun run build && bunx oyadotai dev    # the lightweight CLI Studio, serving oya.config.ts
+make dev                              # the playground (builds libs, then runs it)
+bun run build && bunx oyadotai dev    # the CLI, serving oya.config.ts — same Studio, shipped in the package
 ```
 
 **In your own project** — add an `oya.config.ts` that exports your agents, then `bunx oyadotai dev`:

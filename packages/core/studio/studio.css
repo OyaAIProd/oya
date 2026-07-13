@@ -9,8 +9,8 @@
   --color-muted: oklch(0.68 0.012 250);
   --color-faint: oklch(0.52 0.012 250);
   --color-line: oklch(0.28 0.012 250 / 0.55);
-  --color-brand: oklch(0.62 0.19 250);
-  --color-brand-fg: oklch(0.14 0.01 250);
+  --color-brand: oklch(0.62 0.17 145);
+  --color-brand-fg: oklch(0.16 0.03 145);
 
   --color-opaque: oklch(0.62 0.02 250);
   --color-summary: oklch(0.8 0.14 85);
@@ -21,7 +21,7 @@
   --font-sans: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
 
-  --shadow-glow: 0 0 22px oklch(0.62 0.19 250 / 0.35);
+  --shadow-glow: 0 0 22px oklch(0.62 0.17 145 / 0.4);
 }
 
 * {
@@ -39,8 +39,8 @@ body {
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   background-image:
-    radial-gradient(at 0% 0%, oklch(0.62 0.19 250 / 0.08) 0px, transparent 45%),
-    radial-gradient(at 100% 100%, oklch(0.62 0.19 290 / 0.06) 0px, transparent 45%);
+    radial-gradient(at 0% 0%, oklch(0.62 0.17 145 / 0.08) 0px, transparent 45%),
+    radial-gradient(at 100% 100%, oklch(0.62 0.15 175 / 0.06) 0px, transparent 45%);
   background-attachment: fixed;
 }
 
@@ -137,10 +137,10 @@ body {
 @keyframes breathe {
   0%,
   100% {
-    box-shadow: 0 0 0 0 oklch(0.62 0.19 250 / 0.35);
+    box-shadow: 0 0 0 0 oklch(0.62 0.17 145 / 0.4);
   }
   50% {
-    box-shadow: 0 0 0 6px oklch(0.62 0.19 250 / 0);
+    box-shadow: 0 0 0 6px oklch(0.62 0.17 145 / 0);
   }
 }
 .animate-breathe {

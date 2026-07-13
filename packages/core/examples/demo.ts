@@ -50,7 +50,7 @@ const labelOf = (id: string) => {
   return (n.skill ? n.skill.split("@")[0] : n.kind).padEnd(18);
 };
 
-out(`\n  ${C.bold}oya${C.reset} ${C.dim}— plan, don't react${C.reset}\n\n`);
+out(`\n  ${C.bold}Oya${C.reset} ${C.dim}— plan, don't react${C.reset}\n\n`);
 out(`  ${C.dim}❯${C.reset} ${MISSION}\n\n`);
 await sleep(700);
 

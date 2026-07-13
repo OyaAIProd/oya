@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono-jb", display: "swap" });
 
 export const metadata = {
-  title: "oya studio",
+  title: "Oya Studio",
   description: "Plan-don't-react agent studio — watch each plan execute, every value at its projection level.",
 };
 
