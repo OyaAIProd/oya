@@ -1,6 +1,6 @@
 {
   "name": "oyadotai",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "A plan-don't-react framework for LLM agents. The model emits a typed dataflow plan once; the runtime executes it; the model never reads state it shouldn't.",
   "license": "MIT",
   "author": "Oya Labs, Inc.",
