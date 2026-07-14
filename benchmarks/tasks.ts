@@ -1,6 +1,6 @@
 /**
  * Benchmark tasks. Each task is a mission + a set of tools (identical impls used
- * by all three frameworks). `weather` is light; `research` is heavy — it fetches
+ * by all three frameworks). `weather` is light; `research` is heavy - it fetches
  * several large documents and chains many steps, which is where a token loop
  * (re-sending every result each step) blows up and oya (handles stay OPAQUE)
  * doesn't.
@@ -21,7 +21,7 @@ export type Deps = Record<string, string[]>;
 /**
  * A state-fidelity assertion: when `tool` runs, the value it received for
  * parameter `param` MUST deep-equal the canonical value the source tool emitted
- * (recorded in the ledger under `equals`). Any drift = state corruption — the
+ * (recorded in the ledger under `equals`). Any drift = state corruption - the
  * failure mode a ReAct loop introduces by re-emitting values as tool arguments.
  */
 export interface ProvenanceCheck {
@@ -76,7 +76,7 @@ export const weatherTask: Task = {
 
 // --- research (heavy: large documents, many steps) -------------------------
 
-// A realistic ~2KB article body — the kind of payload a token loop re-sends on
+// A realistic ~2KB article body - the kind of payload a token loop re-sends on
 // every subsequent step, and re-emits as tool arguments to use it.
 const PARA =
   "Green tea is rich in polyphenols such as epigallocatechin gallate (EGCG), which act as antioxidants and have been studied for effects on metabolism, cardiovascular markers, and cellular stress. Observational cohorts report associations with modest changes in LDL cholesterol and blood pressure, though randomized trials are smaller and more mixed. Caffeine and L-theanine together are associated with alertness and calm. Effects depend on dose, brewing time, and individual variation. ";
@@ -94,7 +94,7 @@ export const researchTask: Task = {
       execute: ({ query }) => ({
         query,
         results: [
-          { title: "Green tea and health — review", url: "https://ex.org/a" },
+          { title: "Green tea and health - review", url: "https://ex.org/a" },
           { title: "EGCG: a meta-analysis", url: "https://ex.org/b" },
           { title: "Caffeine + L-theanine", url: "https://ex.org/c" },
         ],
@@ -121,19 +121,19 @@ export const researchTask: Task = {
 };
 
 // --- payments (accuracy: state fidelity + order) ---------------------------
-// A clean linear pipeline — lookup -> charge -> email — where each tool consumes
+// A clean linear pipeline - lookup -> charge -> email - where each tool consumes
 // a WHOLE record produced upstream (createTool skills are single-output, so oya
 // wires each record as one OPAQUE handle). The values are distinctive and
 // corruption-prone: a long signed URL, a mixed-case id, a raw cents integer.
 //
-//   oya  : the records are OPAQUE handles the planner wires by name — the model
+//   oya  : the records are OPAQUE handles the planner wires by name - the model
 //          NEVER re-emits them, so what `charge_invoice` / `email_receipt`
 //          receive is byte-identical to what `lookup_order` produced. 0 by
 //          construction.
-//   loop : the model must re-type each record as the next tool's arguments —
-//          the re-tokenisation the paper names — so a field can silently drift.
+//   loop : the model must re-type each record as the next tool's arguments -
+//          the re-tokenisation the paper names - so a field can silently drift.
 
-// Deliberately long, high-entropy values — a full UUID, a long numeric account
+// Deliberately long, high-entropy values - a full UUID, a long numeric account
 // reference, and a long signed URL. The longer and more random the string, the
 // more likely the model re-types it wrong: a dropped digit, a transposed hex
 // pair, a truncated signature. The amount stays a REALISTIC sum (an absurd one
@@ -205,14 +205,14 @@ export const paymentsTask: Task = {
 // critical token is produced by the first tool, then threads through
 // fetch → normalize → validate → post_update, which must receive it
 // BYTE-FOR-BYTE. `fetch_record` returns a BULKY payload carrying a look-alike
-// DISTRACTOR id — the trick that tempts a token loop into re-emitting the wrong
+// DISTRACTOR id - the trick that tempts a token loop into re-emitting the wrong
 // or mangled token, even on a strong model (mere length does not; the distractor
 // does). oya wires the token handle straight from `get_transaction` to
 // `post_update` and never reads the record, so it can neither grab the distractor
-// nor corrupt the token — 0 by construction.
+// nor corrupt the token - 0 by construction.
 
 const TXN = "TXN-7f3a9c2e-8b1d-4e6f-a1b2-9c8d7e6f5a4b";
-// A *look-alike* related id — same shape, differs only in the middle segments —
+// A *look-alike* related id - same shape, differs only in the middle segments -
 // the "distractor" the paper uses to tempt a wrong/blended copy. Distinct enough
 // to be a different transaction, close enough that a model re-typing from memory
 // can drift toward it.

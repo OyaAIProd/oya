@@ -1,5 +1,5 @@
 /**
- * The high-level agent surface — Mastra-compatible.
+ * The high-level agent surface - Mastra-compatible.
  *
  * `new Agent({ name, instructions, model, tools }).generate(prompt)` mirrors
  * `@mastra/core`'s Agent so a Mastra app migrates by swapping imports. Under the
@@ -85,7 +85,7 @@ export class Agent {
 
   /**
    * Mastra-compatible streaming. Returns `{ fullStream, textStream, text, result }`
-   * — `fullStream` carries structured events (plan, node-start/finish with
+   * - `fullStream` carries structured events (plan, node-start/finish with
    * projected handles, text deltas, finish); `textStream` yields just the answer
    * deltas. The run executes in the background as you consume.
    */
@@ -159,7 +159,7 @@ function pickOutput(result: PlannerResult, outputs: Record<string, unknown>): un
   return Object.fromEntries(names.map((n) => [n, outputs[n]]));
 }
 
-/** Strictly the TRANSPARENT exit(s) — never falls back to OPAQUE values. */
+/** Strictly the TRANSPARENT exit(s) - never falls back to OPAQUE values. */
 function transparentOutput(result: PlannerResult, outputs: Record<string, unknown>): unknown {
   const plan = result.plan;
   const names = plan

@@ -3,7 +3,7 @@
 //   make dev                                    # builds the libs, then starts Studio
 //   ANTHROPIC_API_KEY=sk-... bunx oyadotai dev  # if the libs are already built
 //
-// Studio opens at http://localhost:4000 — chat with the agent and watch each plan
+// Studio opens at http://localhost:4000 - chat with the agent and watch each plan
 // execute: the DAG, the trace, and every value at its projection level (OPAQUE
 // values stay hidden from the model; TRANSPARENT ones are shown).
 import { Agent, createTool } from "oyadotai";

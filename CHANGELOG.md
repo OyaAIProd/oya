@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **How releases work:** CI auto-publishes a patch release of both packages to npm
 > on every merge to `main` (see `.github/workflows/ci.yml`), so version numbers
 > increment quickly and a release commit follows the change that shipped in it.
-> The two packages are versioned together. oya is pre-1.0 — minor versions may
+> The two packages are versioned together. oya is pre-1.0 - minor versions may
 > include breaking changes; they'll be called out here.
 
 ## [Unreleased]
@@ -30,18 +30,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Corrected `oya-labs/oya` → `OyaAIProd/oya` GitHub URLs in the docs.
 
-## [0.1.7] — 2026-07-13
+## [0.1.7] - 2026-07-13
 
 ### Added
 - Studio renders agent responses as Markdown; expanded docs.
 
-## [0.1.6] — 2026-07-13
+## [0.1.6] - 2026-07-13
 
 ### Changed
 - Oya brand refresh in Studio: ring logo, green (`#2ca01c`) palette, "Oya"
   wordmark.
 
-## [0.1.5] — 2026-07-13
+## [0.1.5] - 2026-07-13
 
 ### Added
 - `bunx oyadotai dev` now serves the full React Flow Studio SPA from the CLI,

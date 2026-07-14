@@ -8,7 +8,7 @@ const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono-jb
 
 export const metadata = {
   title: "Oya Studio",
-  description: "Plan-don't-react agent studio — watch each plan execute, every value at its projection level.",
+  description: "Plan-don't-react agent studio - watch each plan execute, every value at its projection level.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

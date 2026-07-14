@@ -5,19 +5,19 @@
 ### Agents that **plan, don't react.**
 
 The model writes a typed plan **once**. The runtime runs it. Tool outputs never go
-back through the model — so your agent **can't be prompt-injected through its tools,
+back through the model - so your agent **can't be prompt-injected through its tools,
 costs a fraction, and runs the same every time.**
 
 **Drop-in for Mastra.** TypeScript · Bun · MIT
 
 [Quickstart](#quickstart) · [The numbers](#the-numbers) · [Why](#why) · [Migrate from Mastra](#migrate-from-mastra-in-2-lines) · [Studio](#studio) · [White paper](#white-paper)
 
-**The open-source core behind [oya.ai](https://oya.ai) — the hosted platform for plan-don't-react agents.**
+**The open-source core behind [oya.ai](https://oya.ai) - the hosted platform for plan-don't-react agents.**
 
 </div>
 
-<!-- LAUNCH: drop the studio GIF here before publishing — capture it with DEMO.md -->
-<p align="center"><img src="https://raw.githubusercontent.com/OyaAIProd/oya/main/studio.gif" width="820" alt="oya Studio — a plan executing live: the DAG, the trace, and each value at its projection level"></p>
+<!-- LAUNCH: drop the studio GIF here before publishing - capture it with DEMO.md -->
+<p align="center"><img src="https://raw.githubusercontent.com/OyaAIProd/oya/main/studio.gif" width="820" alt="oya Studio - a plan executing live: the DAG, the trace, and each value at its projection level"></p>
 
 ---
 
@@ -43,7 +43,7 @@ const agent = new Agent({
 const { text } = await agent.generate("How's the weather in NYC?");
 ```
 
-That's the whole API — the **same shape as Mastra**. Types are inferred from your
+That's the whole API - the **same shape as Mastra**. Types are inferred from your
 zod schema, and every value is `OPAQUE` to the model by default. You did less work
 and it's injection-safe.
 
@@ -58,16 +58,16 @@ Same task, same tools, real Anthropic API, 3 trials on `claude-opus-4-7`:
 | latency | 20.0s | 20.2s | **6.3s** |
 | same plan every run? | no | no | **yes** |
 
-**½ the tokens of the leanest loop, 5× fewer than Mastra, ~3× faster — and
+**½ the tokens of the leanest loop, 5× fewer than Mastra, ~3× faster - and
 deterministic.** Reproduce: `bun run bench claude-opus-4-7`. (The gap narrows on
-smaller/cheaper models and widens with bigger payloads — full methodology and
+smaller/cheaper models and widens with bigger payloads - full methodology and
 numbers in [`benchmarks/`](https://github.com/OyaAIProd/oya/tree/main/benchmarks).)
 
 ## Why
 
 Every other agent framework is a **token loop** (ReAct, LangGraph, AutoGen, Mastra,
 the Vercel AI SDK): the model picks a tool, sees the **raw** result, picks the next.
-Every URL, ID, and document flows back through the model. Three bugs follow — every
+Every URL, ID, and document flows back through the model. Three bugs follow - every
 time:
 
 ```
@@ -89,13 +89,13 @@ each value is shown to the model only at the level the plan declares:
 
 | level | the model sees | for |
 |---|---|---|
-| `OPAQUE` *(default)* | type + provenance — **never the bytes** | URLs, IDs, docs, payloads, secrets |
+| `OPAQUE` *(default)* | type + provenance - **never the bytes** | URLs, IDs, docs, payloads, secrets |
 | `SUMMARY` | a bounded projection (`{count}`) | facts to branch on |
 | `TRANSPARENT` | the full value | the user's message, the final answer |
 
 An attacker can stuff a payload into any fetched page. The model **never reads that
 handle**, so indirect prompt injection through tool output has nowhere to land. You
-annotate none of this — it's `OPAQUE` by default.
+annotate none of this - it's `OPAQUE` by default.
 
 ## Migrate from Mastra in 2 lines
 
@@ -112,11 +112,11 @@ annotate none of this — it's `OPAQUE` by default.
 Same `createTool({ id, inputSchema, execute })` and
 `new Agent({ name, instructions, model, tools }).generate(prompt)` (returns
 `{ text }`). The difference is underneath: oya emits a checked plan and executes it
-instead of looping — so a migrated app gets the numbers above for free.
+instead of looping - so a migrated app gets the numbers above for free.
 
 ## Studio
 
-Chat with your agents and watch each plan execute live — the DAG, the trace, and
+Chat with your agents and watch each plan execute live - the DAG, the trace, and
 every value at its projection level (`OPAQUE` shows nothing, `TRANSPARENT` shows
 the value). In your project:
 
@@ -131,17 +131,17 @@ bunx oyadotai dev      # → oya Studio at localhost:4000
 ## Use it anywhere
 
 oya is a **library, not a platform**. Run an agent in a script, a Next.js route, a
-Bun server, a worker, the edge — `await agent.generate(prompt)`. Stream it with
+Bun server, a worker, the edge - `await agent.generate(prompt)`. Stream it with
 `agent.stream(prompt)` (structured events, not a token soup) and render it with
 `oya/react`'s `usePlan` / `useChat`, or serve SSE with `oyadotai-server`.
 
 ## Built on this: [oya.ai](https://oya.ai)
 
-This package is the **open-source core** that [**oya.ai**](https://oya.ai) runs on —
+This package is the **open-source core** that [**oya.ai**](https://oya.ai) runs on -
 the same plan-once runtime, projection types, and Studio, now hosted. Want the
 managed platform (deploy agents, schedules, skills, and the Studio without running
 any infrastructure) instead of wiring it up yourself? Start at
-**[oya.ai](https://oya.ai)** — everything you build against this library is the same
+**[oya.ai](https://oya.ai)** - everything you build against this library is the same
 engine that powers it.
 
 ## Install
@@ -163,14 +163,14 @@ bun add oyadotai zod
 
 ```bash
 make dev        # oya Studio
-make test       # bun:test — checked against the Python reference runtime
+make test       # bun:test - checked against the Python reference runtime
 make bench      # the comparison
 make check      # typecheck + test, every package
 ```
 
 ## Community & contributing
 
-oya is a community project — contributions of every size are welcome.
+oya is a community project - contributions of every size are welcome.
 
 - [Contributing guide](https://github.com/OyaAIProd/oya/blob/main/CONTRIBUTING.md) · [Good first issues](https://github.com/OyaAIProd/oya/labels/good%20first%20issue)
 - [Discussions](https://github.com/OyaAIProd/oya/discussions) · [Code of Conduct](https://github.com/OyaAIProd/oya/blob/main/CODE_OF_CONDUCT.md) · [Governance](https://github.com/OyaAIProd/oya/blob/main/GOVERNANCE.md)
@@ -181,7 +181,7 @@ oya is a community project — contributions of every size are welcome.
 oya is the TypeScript implementation of *Plan, Don't React: Projection Types for LLM
 Agent Runtimes*. Read the white paper:
 
-- [Plan, Don't React — the white paper](https://drive.google.com/file/d/1JLzaIU0DmOOomoumReSGRnMXdtAgySpv/view?usp=sharing)
+- [Plan, Don't React - the white paper](https://drive.google.com/file/d/1JLzaIU0DmOOomoumReSGRnMXdtAgySpv/view?usp=sharing)
 - [Companion paper](https://drive.google.com/file/d/1uYflhyJhQuZ5nU0rAfePpjYLcSS65uYU/view?usp=sharing)
 
 ## License

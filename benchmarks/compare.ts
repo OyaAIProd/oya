@@ -4,7 +4,7 @@
  *
  *   ANTHROPIC_API_KEY=sk-... bun run bench [model] [trials] [--task research|weather]
  *
- * Default task is `research` (heavy: large documents, many steps — where a token
+ * Default task is `research` (heavy: large documents, many steps - where a token
  * loop re-sends every payload and blows up, and oya's OPAQUE handles win). Pass
  * `--task weather` for the light case. Reports cost (tokens) and latency as
  * mean ± stddev; the stddev is itself the determinism signal (oya is tight, the
@@ -18,7 +18,7 @@ import { runOya } from "./oya.js";
 import { runVercel } from "./vercel.js";
 
 if (!process.env.ANTHROPIC_API_KEY) {
-  console.error("This benchmark calls the real Anthropic API — set ANTHROPIC_API_KEY.");
+  console.error("This benchmark calls the real Anthropic API - set ANTHROPIC_API_KEY.");
   process.exit(1);
 }
 
@@ -49,7 +49,7 @@ const fmt = (s: { mean: number; sd: number }) => (s.sd >= 1 ? `${Math.round(s.me
 
 // --- correctness (the paper's claim: a ReAct loop corrupts state and order) --
 
-/** Order-insensitive structural equality — key order doesn't count as drift. */
+/** Order-insensitive structural equality - key order doesn't count as drift. */
 function canonical(v: unknown): string {
   const seen = (x: unknown): unknown => {
     if (Array.isArray(x)) return x.map(seen);
@@ -72,7 +72,7 @@ export interface Corruption {
   expected: unknown;
   got: unknown;
 }
-/** Values that reached a consumer mangled — corrupted state that still "succeeded". */
+/** Values that reached a consumer mangled - corrupted state that still "succeeded". */
 function stateCorruptions(t: Task, L: RunLedger): Corruption[] {
   const out: Corruption[] = [];
   for (const p of t.provenance ?? []) {
@@ -157,7 +157,7 @@ for (const [name, run] of runners) {
     // Snapshot what actually flowed through this run, then score correctness.
     const led: RunLedger = { received: ledger.received.map((r) => ({ ...r })), emitted: { ...ledger.emitted } };
     runs.push(m);
-    // Correctness is judged over the TASK's real tools only — drop each
+    // Correctness is judged over the TASK's real tools only - drop each
     // framework's own scaffolding nodes (oya's extract/summarise, the loops' final).
     const seq = m.sequence.filter((s) => taskToolIds.has(s));
     const corrupt = stateCorruptions(task, led);
@@ -227,7 +227,7 @@ console.log(line("  output", aggs.map((a) => fmtN(a.out))));
 console.log(line("latency", aggs.map((a) => fmtSec(a.lat))));
 console.log(line("failed runs", aggs.map((a) => `${a.errors.length}/${trials}`)));
 
-// Correctness — the paper's claim. Only shown for tasks that declare a spec.
+// Correctness - the paper's claim. Only shown for tasks that declare a spec.
 if (task.provenance || task.deps || task.required) {
   console.log("\n" + header("correctness"));
   console.log(rule());
@@ -241,7 +241,7 @@ if (task.provenance || task.deps || task.required) {
   if (ev && ev.cor.sample) {
     const s = ev.cor.sample;
     const trim = (v: unknown) => JSON.stringify(v).replace(/^"|"$/g, "");
-    console.log("\n  " + coral(`state corruption caught — ${ev.framework}, ${s.tool}.${s.param}:`));
+    console.log("\n  " + coral(`state corruption caught - ${ev.framework}, ${s.tool}.${s.param}:`));
     console.log("    emitted:  " + dim(trim(s.expected)));
     console.log("    re-sent:  " + bold(trim(s.got)));
   }
@@ -265,7 +265,7 @@ if (oya && oya.tot.mean > 0 && loops.length) {
   if (task.provenance) {
     console.log(
       "  " + coral("→ ") +
-        "oya preserves every critical value byte-for-byte and honours every ordering constraint — " +
+        "oya preserves every critical value byte-for-byte and honours every ordering constraint - " +
         bold("guaranteed by construction") + ": values stay OPAQUE and are never re-emitted through the model.",
     );
   }

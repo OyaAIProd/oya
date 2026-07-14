@@ -1,4 +1,4 @@
-/** The Vercel AI SDK runner — a real token loop. */
+/** The Vercel AI SDK runner - a real token loop. */
 
 import { anthropic } from "@ai-sdk/anthropic";
 import { generateText, stepCountIs, tool } from "ai";

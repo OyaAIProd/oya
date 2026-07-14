@@ -53,7 +53,7 @@ const FETCH_PLAN = {
   exits: ["doc"],
 };
 
-// Statically invalid via an unknown skill ref — a failure the planner cannot
+// Statically invalid via an unknown skill ref - a failure the planner cannot
 // auto-repair (unlike under-declared projections, which normalizeProjections fixes).
 const BAD_PLAN = {
   plan_id: "bad",
@@ -118,7 +118,7 @@ describe("planner", () => {
     const res = await new Planner(catReplan(), llm).run("do the thing");
     expect(res.ok).toBe(true);
     // P4: the OPAQUE `secret` produced before the failure must not appear in any
-    // prompt the planner sent — not even on the replan turn.
+    // prompt the planner sent - not even on the replan turn.
     for (const { system, user } of llm.prompts) {
       expect(system).not.toContain(SENTINEL);
       expect(user).not.toContain(SENTINEL);

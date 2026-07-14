@@ -12,7 +12,7 @@
   --color-brand: oklch(0.62 0.17 145);
   --color-brand-fg: oklch(0.16 0.03 145);
 
-  /* projection levels — oya's own semantics */
+  /* projection levels - oya's own semantics */
   --color-opaque: oklch(0.62 0.02 250);
   --color-summary: oklch(0.8 0.14 85);
   --color-transp: oklch(0.78 0.15 165);

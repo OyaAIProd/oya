@@ -9,7 +9,7 @@
  * A `Catalog` is the planner's procedural memory: it holds skills and emits a
  * `CatalogSnapshot` the planner reasons over.
  *
- * Skill functions take a single object of named parameters and may be async — a
+ * Skill functions take a single object of named parameters and may be async - a
  * deliberate divergence from the synchronous Python reference, since real skills
  * do I/O.
  */
@@ -54,7 +54,7 @@ export interface SkillInit {
   costMaxSeconds?: number;
   /**
    * Model-facing usage doc shown to the planner: what the skill does and the
-   * allowed values (enums) for its parameters — without this the planner guesses
+   * allowed values (enums) for its parameters - without this the planner guesses
    * `args` (e.g. action="create" vs "create_pdf").
    */
   description?: string;
@@ -180,7 +180,7 @@ export class Catalog {
 export interface SkillConfig<I extends ZodTypeAny = ZodTypeAny, O = unknown> {
   /** Stable identifier. If omitted, derived from `description`. */
   name?: string;
-  /** What the skill does + allowed param values — shown to the planner. */
+  /** What the skill does + allowed param values - shown to the planner. */
   description?: string;
   version?: number;
   /** Pure skills are memoised on (ref, inputs). */

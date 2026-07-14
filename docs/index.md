@@ -18,7 +18,7 @@ hero:
 
 features:
   - title: OPAQUE by default
-    details: Every value is a typed handle the planner sees only at its declared projection level. URLs, IDs, documents, credentials stay OPAQUE — type and provenance only, never the bytes.
+    details: Every value is a typed handle the planner sees only at its declared projection level. URLs, IDs, documents, credentials stay OPAQUE - type and provenance only, never the bytes.
   - title: Ordering by construction
     details: The runtime executes a checked DAG in topological order. Inversion, skipping, and interleaving of dependent steps are not paths the runtime can take.
   - title: Prompt injection, closed at the root

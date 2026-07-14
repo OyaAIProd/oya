@@ -34,25 +34,25 @@ console.log(text);
 ```
 
 Types are inferred from the zod schema. Every value defaults to `OPAQUE`, so tool
-outputs never reach the model — you write zero projection annotations. Migrating
+outputs never reach the model - you write zero projection annotations. Migrating
 from Mastra is just changing the imports (see the README).
 
-There's also an oya-native form — `skill({ name, input, run })` and
-`agent.run(prompt)` returning the projected outputs — if you prefer it.
+There's also an oya-native form - `skill({ name, input, run })` and
+`agent.run(prompt)` returning the projected outputs - if you prefer it.
 
-> The rest of this page covers the **low-level runtime** underneath `Agent` —
+> The rest of this page covers the **low-level runtime** underneath `Agent` -
 > reach for it only to inspect or hand-build a plan.
 
 ## The shape of a run
 
-1. A **planner** model emits a typed dataflow **Plan IR** — a DAG of named,
+1. A **planner** model emits a typed dataflow **Plan IR** - a DAG of named,
    typed **handles** produced and consumed by **nodes**.
 2. The runtime runs **8 static checks** over the plan (acyclic, well-typed,
    projection-consistent, bounded, in-budget, …). A bad plan is rejected before
    anything executes.
 3. The **executor** runs the DAG in topological order. State flows between skills
    through a full-fidelity handle table. The model is re-engaged only at
-   `extract` / `summarise` nodes — never to pass a value from one skill to the
+   `extract` / `summarise` nodes - never to pass a value from one skill to the
    next.
 4. The planner only ever sees the **projected view** of the handle table: each
    handle at its declared level (`OPAQUE` / `SUMMARY` / `TRANSPARENT`).
@@ -60,7 +60,7 @@ There's also an oya-native form — `skill({ name, input, run })` and
 ## Build and run a plan directly
 
 You can construct and execute a plan against a `Catalog` of skills with no model
-in the loop — useful for tests and for understanding the runtime:
+in the loop - useful for tests and for understanding the runtime:
 
 ```ts
 import { Catalog, Executor, Plan, Handle, Projection, SkillNode } from "oyadotai";

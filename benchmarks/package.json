@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "oya vs Vercel AI SDK vs Mastra — live token/latency/reliability benchmark.",
+  "description": "oya vs Vercel AI SDK vs Mastra - live token/latency/reliability benchmark.",
   "scripts": {
     "bench": "bun compare.ts",
     "typecheck": "tsc --noEmit"

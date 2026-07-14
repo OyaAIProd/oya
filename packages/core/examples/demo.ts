@@ -1,5 +1,5 @@
 /**
- * A paced terminal demo of a plan-don't-react run — for a screen/GIF capture.
+ * A paced terminal demo of a plan-don't-react run - for a screen/GIF capture.
  * Canned local model, no API key, deterministic.
  *
  *   make demo      (or: bun examples/demo.ts)
@@ -50,7 +50,7 @@ const labelOf = (id: string) => {
   return (n.skill ? n.skill.split("@")[0] : n.kind).padEnd(18);
 };
 
-out(`\n  ${C.bold}Oya${C.reset} ${C.dim}— plan, don't react${C.reset}\n\n`);
+out(`\n  ${C.bold}Oya${C.reset} ${C.dim}- plan, don't react${C.reset}\n\n`);
 out(`  ${C.dim}❯${C.reset} ${MISSION}\n\n`);
 await sleep(700);
 
@@ -61,7 +61,7 @@ for await (const e of new Agent({ name: "WeatherBot", model, tools }).stream(MIS
     await sleep(450);
   } else if (e.type === "node-finish") {
     const h = Object.values(e.handles)[0] as { projection?: string } | undefined;
-    const lvl = h?.projection ?? "—";
+    const lvl = h?.projection ?? "-";
     const tag =
       lvl === "OPAQUE" ? `${C.gray}OPAQUE · hidden from the model${C.reset}`
       : lvl === "TRANSPARENT" ? `${C.green}TRANSPARENT${C.reset}`
@@ -75,4 +75,4 @@ for await (const e of new Agent({ name: "WeatherBot", model, tools }).stream(MIS
 
 out(`\n  ${C.coral}❯${C.reset} `);
 for (const ch of answer) { out(ch); await sleep(18); }
-out(`\n\n  ${C.gray}the PDF and the web page stayed OPAQUE — the model never read them.${C.reset}\n\n`);
+out(`\n\n  ${C.gray}the PDF and the web page stayed OPAQUE - the model never read them.${C.reset}\n\n`);

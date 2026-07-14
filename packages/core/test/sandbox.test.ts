@@ -23,7 +23,7 @@ describe("sandbox", () => {
     try {
       out = await new WorkerSandbox(15_000).run(skill(), { x: 7 });
     } catch {
-      return; // environment may forbid worker threads — don't fail CI
+      return; // environment may forbid worker threads - don't fail CI
     }
     expect(out.value).toBe(49);
   });

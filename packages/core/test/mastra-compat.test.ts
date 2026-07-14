@@ -40,7 +40,7 @@ const PLAN = {
 };
 
 describe("Mastra compatibility", () => {
-  // Exactly the shape a Mastra user wrote — only the imports changed.
+  // Exactly the shape a Mastra user wrote - only the imports changed.
   const getWeather = createTool({
     id: "get_weather",
     description: "Look up the current weather for a city",

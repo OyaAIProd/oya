@@ -4,7 +4,7 @@
  * Ported from `oya_planner/planner.py`. The planner model is engaged to (a) emit
  * a Plan IR for a mission, (b) run `extract` / `summarise` nodes scoped to a
  * single node, and (c) emit a replacement plan on a failure. It is never handed
- * an OPAQUE value — replan re-engagement sees only the projected handle table
+ * an OPAQUE value - replan re-engagement sees only the projected handle table
  * (P4).
  *
  * The model is abstracted behind `LLMClient` so the runtime has no hard network
@@ -206,7 +206,7 @@ export class Planner {
         plan = this.materialise(raw, mission);
       } catch (exc) {
         // Malformed / truncated plan JSON: retry with the parse error fed back,
-        // same as a static-check failure — don't abort the whole run on one bad emit.
+        // same as a static-check failure - don't abort the whole run on one bad emit.
         priorErrors = [`invalid_plan_json: ${errMessage(exc)}`];
         result.emitRetries = attempt + 1;
         continue;
@@ -274,7 +274,7 @@ export class Planner {
   private materialise(raw: string, mission: string): Plan {
     const data = parseJSON(raw);
     const plan = Plan.fromJSON(data);
-    // The planner — not the model — owns the catalogue snapshot and mission.
+    // The planner - not the model - owns the catalogue snapshot and mission.
     plan.catalogSnapshot = this.catalog.snapshot();
     plan.mission = new Mission({ kind: plan.mission.kind, content: mission });
     normalizeProjections(plan);
@@ -287,7 +287,7 @@ function errMessage(exc: unknown): string {
 }
 
 /**
- * Check codes that are advisory, not safety/correctness — a real model often
+ * Check codes that are advisory, not safety/correctness - a real model often
  * produces a plan with a stray unconsumed handle on a complex mission. Those are
  * wasteful, not invalid, so the runtime runs the plan anyway rather than failing.
  */
@@ -333,18 +333,18 @@ function planningSystem(
     exits: ["answer", "pdf"],
   };
   const parts = [
-    "You are a planner that emits ONE typed dataflow Plan IR as a JSON object. No prose, no markdown fences — start with { and end with }.",
-    // The wiring invariant — stated first and bluntly, because handle_undefined and
+    "You are a planner that emits ONE typed dataflow Plan IR as a JSON object. No prose, no markdown fences - start with { and end with }.",
+    // The wiring invariant - stated first and bluntly, because handle_undefined and
     // handle_no_producer (mis-matched names) are the failures that abort plans.
-    "WIRING INVARIANT — the plan is a graph wired ONLY by handle NAMES, so names must " +
+    "WIRING INVARIANT - the plan is a graph wired ONLY by handle NAMES, so names must " +
       "match EXACTLY everywhere. (1) Every name you use in a node's 'inputs' MUST be the " +
-      "exact 'outputs' name of some EARLIER node — copy it character-for-character; never " +
+      "exact 'outputs' name of some EARLIER node - copy it character-for-character; never " +
       "invent a new name on the consuming side, never reference a handle a node has not " +
       "produced yet. (2) Every handle in the top-level 'handles' array is produced by " +
       "exactly ONE node: its 'origin' is that node's id and the name appears in that " +
       "node's 'outputs'. (3) Every name in any node's 'outputs' MUST also appear once in " +
       "'handles'. If you write 'page_1' as an output, spell it 'page_1' in handles and in " +
-      "every consumer — not 'page1', 'source_1', or 'pages'. Before finishing, re-read the " +
+      "every consumer - not 'page1', 'source_1', or 'pages'. Before finishing, re-read the " +
       "plan and confirm every inputs name resolves to an earlier outputs name.",
     "A skill node binds the skill's parameters two ways: 'inputs' = HANDLE references " +
       "(values PRODUCED by other nodes), 'args' = LITERAL constant values you supply " +
@@ -357,9 +357,9 @@ function planningSystem(
     "Use kind 'skill' for EVERY catalogue skill below (deterministic). Use 'extract' " +
       "only to pull a value from a TRANSPARENT text input when NO catalogue skill does " +
       "it; 'summarise' only for a user-facing summary.",
-    // Minimality — cuts the extract->extract->extract noise and the token/round-trip
+    // Minimality - cuts the extract->extract->extract noise and the token/round-trip
     // variance it causes; also keeps the plan JSON short enough not to truncate.
-    "Emit the MINIMAL plan: the fewest nodes that satisfy the mission — ideally ONE node " +
+    "Emit the MINIMAL plan: the fewest nodes that satisfy the mission - ideally ONE node " +
       "per catalogue action the mission names, plus one leading 'extract' only if a skill " +
       "needs a value pulled from the mission text, plus the final 'summarise'. Do NOT add " +
       "extra extract/summarise nodes, do NOT chain extract into extract, and do NOT " +
@@ -368,7 +368,7 @@ function planningSystem(
       "a node for EACH one and list each result in 'exits'. Do not drop requested steps.",
     "ALWAYS end with a 'summarise' node that writes the final natural-language reply to " +
       "the user as a TRANSPARENT handle, and include that handle in 'exits'. Even an " +
-      "action-heavy mission needs a reply — never finish with only artifacts and no answer.",
+      "action-heavy mission needs a reply - never finish with only artifacts and no answer.",
     "Projection (disclosure to you, the planner): default EVERY handle to OPAQUE. Use " +
       "TRANSPARENT ONLY for the final user-facing outputs and for a handle that an " +
       "extract/summarise node must read. Use SUMMARY ONLY for a handle a branch " +

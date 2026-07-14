@@ -3,12 +3,12 @@
  *
  * Ported from `oya_planner/projection/projector.py` (spec/projection-types.md
  * §2.2). A projection function takes a full-fidelity value and returns a small,
- * bounded object the planner model is allowed to branch on — never the value
+ * bounded object the planner model is allowed to branch on - never the value
  * itself.
  *
  * The functions here are:
- *   - **pure** — no side effects, deterministic.
- *   - **bounded** — output size is capped and they do not recurse into nested
+ *   - **pure** - no side effects, deterministic.
+ *   - **bounded** - output size is capped and they do not recurse into nested
  *     fields, so a projection can never smuggle the full value back into the
  *     planner's context.
  *

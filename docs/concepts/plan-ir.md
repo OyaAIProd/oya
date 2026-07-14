@@ -51,18 +51,18 @@ directly. Each parameter is filled by one or the other, never both.
 
 Before any execution, every plan must pass:
 
-1. **Acyclic** — the dataflow graph is a DAG.
-2. **All handles produced** — every handle has exactly one producing node.
-3. **All handles consumed** — every handle flows downstream or appears in `exits`.
-4. **Type correctness** — every edge's source type is a subtype of the target's.
-5. **Projection consistency** — no node reads a handle below its required level.
-6. **Skill availability** — every `name@version` resolves in the catalogue snapshot.
-7. **Boundedness** — every `for_each` has a statically known upper bound.
-8. **Cost budget** — worst-case cost is within the per-mission budget.
+1. **Acyclic** - the dataflow graph is a DAG.
+2. **All handles produced** - every handle has exactly one producing node.
+3. **All handles consumed** - every handle flows downstream or appears in `exits`.
+4. **Type correctness** - every edge's source type is a subtype of the target's.
+5. **Projection consistency** - no node reads a handle below its required level.
+6. **Skill availability** - every `name@version` resolves in the catalogue snapshot.
+7. **Boundedness** - every `for_each` has a statically known upper bound.
+8. **Cost budget** - worst-case cost is within the per-mission budget.
 
 A plan that fails any check is rejected with a structured error, and the planner
-is asked to re-emit. The IR tolerates the messy shapes real models emit —
-`{param: handle}` maps, `null` positional placeholders, the `else` branch alias —
+is asked to re-emit. The IR tolerates the messy shapes real models emit -
+`{param: handle}` maps, `null` positional placeholders, the `else` branch alias -
 and normalises them before checking.
 
 ## Why a typed IR

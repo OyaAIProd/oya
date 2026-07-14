@@ -1,4 +1,4 @@
-# oya — monorepo tasks. Requires Bun (https://bun.sh).
+# oya - monorepo tasks. Requires Bun (https://bun.sh).
 .DEFAULT_GOAL := help
 .PHONY: help install dev build build-libs example test typecheck check bench docs clean deploy
 
@@ -46,6 +46,6 @@ clean: ## Remove build output and caches
 	rm -rf packages/*/dist apps/playground/.next docs/.vitepress/cache docs/.vitepress/dist
 	find . -name node_modules -maxdepth 3 -type d -prune -exec rm -rf {} +
 
-deploy: ## Deploy agents to Oya Cloud (Phase 2 — not yet available)
-	@echo "Oya Cloud deployment is Phase 2 — coming soon."
+deploy: ## Deploy agents to Oya Cloud (Phase 2 - not yet available)
+	@echo "Oya Cloud deployment is Phase 2 - coming soon."
 	@echo "Today, oya runs anywhere as a library: 'bun add oyadotai' and ship it in any Node/Bun/edge runtime."

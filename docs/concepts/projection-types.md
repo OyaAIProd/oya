@@ -30,7 +30,7 @@ Every handle carries exactly one projection level:
 
 | Level | The planner sees | Use for |
 |---|---|---|
-| `OPAQUE` | the handle exists, its type, and which node produced it — **nothing else** | URLs, IDs, file paths, raw responses, embeddings, credentials, customer data |
+| `OPAQUE` | the handle exists, its type, and which node produced it - **nothing else** | URLs, IDs, file paths, raw responses, embeddings, credentials, customer data |
 | `SUMMARY` | a **bounded, pure** projection (e.g. `{ count, first_item_kind }`) | branching on a coarse fact ("zero, one, or many results?") |
 | `TRANSPARENT` | the full value | the user's message; the model's own prose to critique; final outputs |
 
@@ -41,7 +41,7 @@ in the plan); **demotion is free** (the standard lattice subsumption rule).
 
 A plan that omits a handle's projection gets `OPAQUE`. The planner cannot
 accidentally promote a value to `TRANSPARENT` by forgetting to annotate it. Every
-disclosure is a deliberate decision in the emitted plan — the projection analogue
+disclosure is a deliberate decision in the emitted plan - the projection analogue
 of `secrecy = high` in information-flow control.
 
 ## Enforcement
@@ -54,17 +54,17 @@ The lattice is enforced, not advisory:
 - **Projected view.** The runtime stores every handle at full fidelity but
   exposes each to the planner only at its declared level.
 - **Projected errors.** A failing skill yields a typed
-  `SkillError{ class, retryable, node_id }` — any partial `OPAQUE` value it
+  `SkillError{ class, retryable, node_id }` - any partial `OPAQUE` value it
   produced is dropped, never surfaced.
 - **Projected replan.** On a failure the planner sees the projected handle table
-  plus the typed error — never an `OPAQUE` value, even because something went
+  plus the typed error - never an `OPAQUE` value, even because something went
   wrong.
 
 ## The security corollary
 
 An attacker who controls upstream content (a CRM `notes` field, a fetched page)
 can inject any payload. If the handle carrying that content is `OPAQUE`, the
-planner never reads it — so a class of indirect prompt-injection attacks that
+planner never reads it - so a class of indirect prompt-injection attacks that
 work against `TRANSPARENT`-by-default agents is **inexpressible** here. Same end
 as [CaMeL](https://arxiv.org/abs/2503.18813) and f-secure, reached by a different
 mechanism: per-handle metadata on a typed plan IR, checked statically.

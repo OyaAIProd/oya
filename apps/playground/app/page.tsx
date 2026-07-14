@@ -125,7 +125,7 @@ export default function Studio() {
       setLive(ps);
     }
     if (ps.status === "streaming") ps = { ...ps, status: "done" };
-    setBot(a, ps.text || outText || "✓ done — no text answer");
+    setBot(a, ps.text || outText || "✓ done - no text answer");
     setRuns((r) => [...r, { ...ps, id: r.length, agent: a, prompt, usage }]);
     setBusy(false);
   }
@@ -213,7 +213,7 @@ export default function Studio() {
       <main className="flex min-h-0 flex-col">
         <div className="flex items-center gap-3 border-b border-line px-6 py-4">
           <Boxes size={18} className="text-brand" />
-          <span className="text-[17px] font-semibold">{agent || "—"}</span>
+          <span className="text-[17px] font-semibold">{agent || "-"}</span>
           <span className="text-[12px] text-muted">plan-don&apos;t-react agent</span>
         </div>
         <div ref={chatRef} className="scrollbar-thin flex-1 overflow-auto px-6 pb-3 pt-6">
@@ -221,7 +221,7 @@ export default function Studio() {
             <div className="mx-auto mt-[14vh] max-w-lg text-center text-muted">
               <h1 className="mb-2 text-[30px] font-semibold text-fg">{agent}</h1>
               <p className="text-[14px] leading-relaxed">
-                Ask it something — you&apos;ll see the plan execute on the right, every value disclosed only at its
+                Ask it something - you&apos;ll see the plan execute on the right, every value disclosed only at its
                 projection level.
               </p>
               <div className="mt-5 flex flex-wrap justify-center gap-2">
@@ -353,7 +353,7 @@ export default function Studio() {
                     </div>
                   ))}
                   <div className="mono mb-1 mt-4 text-[10px] font-semibold text-faint">OUTPUTS</div>
-                  {!selNode?.handles && <div className="border-b border-line py-2 text-[12px] italic text-faint">— not produced —</div>}
+                  {!selNode?.handles && <div className="border-b border-line py-2 text-[12px] italic text-faint">- not produced -</div>}
                   {selNode?.handles &&
                     Object.entries(selNode.handles).map(([k, h]) => {
                       const hh = h as { projection?: string; value?: unknown; summary?: unknown };
@@ -371,7 +371,7 @@ export default function Studio() {
                             <span className="mono text-[12px] font-bold">{k}</span>
                           </div>
                           {v == null ? (
-                            <div className="mono mt-1.5 text-[12px] italic text-faint">hidden — OPAQUE, the model never saw this</div>
+                            <div className="mono mt-1.5 text-[12px] italic text-faint">hidden - OPAQUE, the model never saw this</div>
                           ) : (
                             <div className="mono mt-1.5 whitespace-pre-wrap break-words text-[12px] leading-6 text-muted">{v}</div>
                           )}

@@ -4,7 +4,7 @@
  * oya streams *structured events*, not a token soup: the emitted plan, each node
  * starting and finishing (with the handles it sealed, at their projection level),
  * the final answer's text deltas, and a terminal finish/error. A consumer can
- * render the DAG and watch it execute — and an `OPAQUE` handle still discloses
+ * render the DAG and watch it execute - and an `OPAQUE` handle still discloses
  * nothing, even mid-stream.
  */
 
@@ -13,7 +13,7 @@ import type { Plan } from "./ir.js";
 import type { PlannerUsage } from "./planner.js";
 
 /**
- * A streamed event. Every variant is **wire-safe** — it carries only what the
+ * A streamed event. Every variant is **wire-safe** - it carries only what the
  * planner is entitled to see, so an event stream can be sent to an untrusted
  * client without leaking an `OPAQUE` value. The `finish` event therefore exposes
  * the TRANSPARENT output only, never the raw exit values or the handle table

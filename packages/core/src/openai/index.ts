@@ -1,5 +1,5 @@
 /**
- * The OpenAI provider — `oya/openai`.
+ * The OpenAI provider - `oya/openai`.
  *
  *     import { openai } from "oyadotai/openai";
  *     const agent = new Agent({ model: openai("gpt-4o"), tools });
@@ -26,7 +26,7 @@ export function openai(modelId: string, opts: OpenAIOptions = {}): LanguageModel
   const url = `${opts.baseURL ?? "https://api.openai.com/v1"}/chat/completions`;
   const key = () => {
     const k = opts.apiKey ?? process.env.OPENAI_API_KEY;
-    if (!k) throw new Error("oya: missing OpenAI API key — set OPENAI_API_KEY or pass openai(model, { apiKey }).");
+    if (!k) throw new Error("oya: missing OpenAI API key - set OPENAI_API_KEY or pass openai(model, { apiKey }).");
     return k;
   };
   const body = (system: string, user: string, stream: boolean) =>

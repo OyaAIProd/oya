@@ -3,7 +3,7 @@
  *
  * Mastra-shaped API (`createTool` + `Agent.generate`), three tools, one mission.
  * The model answers the weather question (it needs the weather, so that value is
- * disclosed), but the generated PDF and HTML page stay OPAQUE — handed to the
+ * disclosed), but the generated PDF and HTML page stay OPAQUE - handed to the
  * user as artifacts, never fed back through the model. In a token loop those whole
  * documents would be re-read into the context.
  *
@@ -85,7 +85,7 @@ for (const [name, h] of Object.entries(view)) {
   const disclosed = "value" in h ? "full value" : "summary" in h ? "summary only" : "nothing";
   console.log(`    ${name.padEnd(8)} ${String(h.projection).padEnd(12)} → ${disclosed}`);
 }
-console.log("\n→ The PDF bytes and the HTML page stayed OPAQUE — never re-read by the model.");
+console.log("\n→ The PDF bytes and the HTML page stayed OPAQUE - never re-read by the model.");
 
 // The plan the model emits (it never appears in your code; shown here for the
 // demo). A function declaration so it's available to the model closure above.

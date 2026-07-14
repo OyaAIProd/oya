@@ -21,7 +21,7 @@ export async function* sseJSON(body: ReadableStream<Uint8Array>): AsyncIterable<
       try {
         yield JSON.parse(payload);
       } catch {
-        // keep-alive / non-JSON line — ignore
+        // keep-alive / non-JSON line - ignore
       }
     }
   }

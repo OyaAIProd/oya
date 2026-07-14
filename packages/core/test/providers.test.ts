@@ -1,5 +1,5 @@
 /**
- * Provider tests — parsing of `complete` (text + usage) and `stream` (deltas),
+ * Provider tests - parsing of `complete` (text + usage) and `stream` (deltas),
  * with a mocked `fetch` (no network). Anthropic is exercised live by the
  * benchmark; these pin OpenAI and Google.
  */

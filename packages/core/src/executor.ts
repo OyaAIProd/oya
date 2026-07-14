@@ -4,17 +4,17 @@
  * Ported from `oya_planner/executor.py` (spec/plan-ir.md §5). The executor runs
  * a checked plan operator-by-operator. State is piped between operators through a
  * full-fidelity handle table; the planner only ever sees the projected view
- * (`./view`). The model is re-engaged only at `extract` / `summarise` nodes —
+ * (`./view`). The model is re-engaged only at `extract` / `summarise` nodes -
  * never to pass an intermediate value from one skill to the next.
  *
  * Key properties this module realises:
- *   - Ordering by construction — nodes run in a topological order over data and
+ *   - Ordering by construction - nodes run in a topological order over data and
  *     control edges; inversion/skip/interleave are not reachable.
- *   - State preservation by construction — a skill receives the exact value an
+ *   - State preservation by construction - a skill receives the exact value an
  *     upstream skill produced, out of the handle table, never via the planner.
- *   - Projected errors (P3) — a failing skill yields a typed `SkillError`; any
+ *   - Projected errors (P3) - a failing skill yields a typed `SkillError`; any
  *     partial value it produced is dropped, never surfaced to the planner.
- *   - Caching — pure skills are memoised on (ref, inputs).
+ *   - Caching - pure skills are memoised on (ref, inputs).
  *
  * Unlike the synchronous Python reference, node execution is async so skills may
  * perform I/O.

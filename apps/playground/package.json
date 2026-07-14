@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "oya Studio — the local agent playground (Next.js).",
+  "description": "oya Studio - the local agent playground (Next.js).",
   "scripts": {
     "dev": "next dev -p 4000",
     "build": "next build",

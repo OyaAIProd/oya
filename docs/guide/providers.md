@@ -1,7 +1,7 @@
 # Model Providers
 
-An oya `Agent` takes a `model`. oya ships three provider adapters — Anthropic,
-OpenAI, and Google — each a small function that returns a `LanguageModel`. They're
+An oya `Agent` takes a `model`. oya ships three provider adapters - Anthropic,
+OpenAI, and Google - each a small function that returns a `LanguageModel`. They're
 interchangeable: the rest of your agent (tools, instructions, `generate` /
 `stream`) stays identical no matter which one plans.
 
@@ -61,7 +61,7 @@ const agent = new Agent({
 ## Passing the key explicitly
 
 Every provider accepts an options object with `apiKey`, so you don't have to rely
-on environment variables — useful in serverless or multi-tenant setups:
+on environment variables - useful in serverless or multi-tenant setups:
 
 ```ts
 anthropic("claude-haiku-4-5-20251001", { apiKey: process.env.MY_ANTHROPIC_KEY });
@@ -74,7 +74,7 @@ variable to set.
 
 ## Swapping providers
 
-Because the provider is just the `model` value, switching is a one-line change —
+Because the provider is just the `model` value, switching is a one-line change -
 your tools, instructions, and the plan-once execution model are unchanged:
 
 ```diff

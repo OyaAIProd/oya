@@ -1,5 +1,5 @@
 /**
- * The Google (Gemini) provider — `oya/google`.
+ * The Google (Gemini) provider - `oya/google`.
  *
  *     import { google } from "oyadotai/google";
  *     const agent = new Agent({ model: google("gemini-2.5-pro"), tools });
@@ -31,7 +31,7 @@ export function google(modelId: string, opts: GoogleOptions = {}): LanguageModel
   const base = opts.baseURL ?? "https://generativelanguage.googleapis.com/v1beta";
   const key = () => {
     const k = opts.apiKey ?? process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY;
-    if (!k) throw new Error("oya: missing Google API key — set GEMINI_API_KEY or pass google(model, { apiKey }).");
+    if (!k) throw new Error("oya: missing Google API key - set GEMINI_API_KEY or pass google(model, { apiKey }).");
     return k;
   };
   const body = (system: string, user: string) =>

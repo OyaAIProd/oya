@@ -59,7 +59,7 @@ function makeCatalog(days: number): Catalog {
   cat.register({ name: "draft_email", version: 2, inputSig: { lead: "CRMRecord", mission: "str" }, outputSig: { draft: "EmailDraft" } })(
     (args) => {
       const lead = args.lead as Lead;
-      return { to: lead.email, body: `Hi ${lead.name} — re: ${args.mission as string}` };
+      return { to: lead.email, body: `Hi ${lead.name} - re: ${args.mission as string}` };
     },
   );
 
@@ -68,7 +68,7 @@ function makeCatalog(days: number): Catalog {
   );
 
   cat.register({ name: "ask_to_confirm", version: 1, inputSig: { status: "RecencyStatus" }, outputSig: { reply: "str" } })(
-    () => "This lead looks stale — confirm before I send?",
+    () => "This lead looks stale - confirm before I send?",
   );
 
   return cat;
@@ -186,7 +186,7 @@ describe("executor", () => {
   it("a skill error is typed and does not leak", async () => {
     const cat = new Catalog("c");
     cat.register({ name: "boom", version: 1, inputSig: { x: "str" }, outputSig: { y: "str" } })(() => {
-      // Build a partial OPAQUE value, then fail — it must never reach the planner.
+      // Build a partial OPAQUE value, then fail - it must never reach the planner.
       throw new RuntimeError(SENTINEL);
     });
 

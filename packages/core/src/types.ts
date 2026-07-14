@@ -12,7 +12,7 @@
  *   - nominal: any other bare identifier (e.g. `URL`, `CRMRecord`); nominal
  *     types are subtypes only of themselves and `Any`.
  *
- * Subtyping is shallow and conservative — enough to catch wiring mistakes, not a
+ * Subtyping is shallow and conservative - enough to catch wiring mistakes, not a
  * full type theory. `Any` is top; `null` is a subtype of every `Optional`.
  */
 

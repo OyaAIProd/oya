@@ -3,8 +3,8 @@ import { Fragment, type ReactNode } from "react";
 /**
  * A tiny, dependency-free Markdown renderer sized for agent chat output.
  * Handles headings, bold/italic, inline & fenced code, links, blockquotes,
- * horizontal rules, and ordered/unordered lists. Not CommonMark-complete —
- * just the subset LLMs actually emit — but safe: all text is escaped by React,
+ * horizontal rules, and ordered/unordered lists. Not CommonMark-complete -
+ * just the subset LLMs actually emit - but safe: all text is escaped by React,
  * so no raw HTML is ever injected.
  */
 

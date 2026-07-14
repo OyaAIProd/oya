@@ -1,5 +1,5 @@
 /**
- * oya — a plan-don't-react framework for LLM agents.
+ * oya - a plan-don't-react framework for LLM agents.
  *
  * The planner model emits a typed dataflow `Plan` once; the runtime executes it;
  * and the model never sees state it should not have read. This module is the

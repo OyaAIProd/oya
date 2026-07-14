@@ -3,7 +3,7 @@
 `demo.gif` (shown in the README hero) is a recording of the paced, deterministic
 "plan, don't react" terminal demo in
 [`packages/core/examples/demo.ts`](./packages/core/examples/demo.ts). It runs
-against a canned local model — **no API key, same output every time** — so the GIF
+against a canned local model - **no API key, same output every time** - so the GIF
 is reproducible.
 
 ## Regenerate it

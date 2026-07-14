@@ -1,5 +1,5 @@
 /**
- * The Anthropic provider — `oya/anthropic`.
+ * The Anthropic provider - `oya/anthropic`.
  *
  *     import { anthropic } from "oyadotai/anthropic";
  *     const agent = new Agent({ model: anthropic("claude-haiku-4-5-20251001"), skills });
@@ -30,7 +30,7 @@ export function anthropic(modelId: string, opts: AnthropicOptions = {}): Languag
       const apiKey = opts.apiKey ?? process.env.ANTHROPIC_API_KEY;
       if (!apiKey) {
         throw new Error(
-          "oya: missing Anthropic API key — set ANTHROPIC_API_KEY or pass anthropic(model, { apiKey }).",
+          "oya: missing Anthropic API key - set ANTHROPIC_API_KEY or pass anthropic(model, { apiKey }).",
         );
       }
       const res = await fetch(`${opts.baseURL ?? "https://api.anthropic.com"}/v1/messages`, {
@@ -64,7 +64,7 @@ export function anthropic(modelId: string, opts: AnthropicOptions = {}): Languag
       const apiKey = opts.apiKey ?? process.env.ANTHROPIC_API_KEY;
       if (!apiKey) {
         throw new Error(
-          "oya: missing Anthropic API key — set ANTHROPIC_API_KEY or pass anthropic(model, { apiKey }).",
+          "oya: missing Anthropic API key - set ANTHROPIC_API_KEY or pass anthropic(model, { apiKey }).",
         );
       }
       const res = await fetch(`${opts.baseURL ?? "https://api.anthropic.com"}/v1/messages`, {

@@ -12,7 +12,7 @@
  *      OPAQUE         type + provenance only   (the default)
  *
  * Higher means more disclosure. Promotion (moving up) is an explicit, audited
- * choice recorded in the plan; demotion (moving down) is free — the standard
+ * choice recorded in the plan; demotion (moving down) is free - the standard
  * lattice subsumption rule (P2).
  */
 

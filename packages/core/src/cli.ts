@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * The `oya` CLI. Today: `oya dev` — start oya Studio against the agents you export
+ * The `oya` CLI. Today: `oya dev` - start oya Studio against the agents you export
  * from `oya.config.ts` in your project. Runs under Bun (so your TS config loads
  * directly); ships in the `oyadotai` package, so `bunx oyadotai dev` just works.
  */
@@ -98,7 +98,7 @@ async function dev(argv: string[]) {
       const server = Bun.serve({ port: p, fetch: handler });
       console.log(`\n  oya studio → http://localhost:${server.port}`);
       console.log(`  agents: ${names.join(", ")}`);
-      if (!process.env.ANTHROPIC_API_KEY) console.log("  (no ANTHROPIC_API_KEY — set it for real model calls)");
+      if (!process.env.ANTHROPIC_API_KEY) console.log("  (no ANTHROPIC_API_KEY - set it for real model calls)");
       console.log("");
       return;
     } catch (e) {
@@ -113,7 +113,7 @@ async function dev(argv: string[]) {
 async function main() {
   const [cmd, ...argv] = process.argv.slice(2);
   if (cmd === "dev") return dev(argv);
-  console.log("oya — plan-don't-react agents\n\nusage:\n  oya dev [--port <n>]   start oya Studio against your oya.config.ts\n");
+  console.log("oya - plan-don't-react agents\n\nusage:\n  oya dev [--port <n>]   start oya Studio against your oya.config.ts\n");
   process.exit(cmd ? 1 : 0);
 }
 

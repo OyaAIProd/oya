@@ -1,9 +1,9 @@
 /**
- * React hooks — `oya/react`.
+ * React hooks - `oya/react`.
  *
  * `usePlan` consumes an oya event stream (an SSE endpoint built with
  * `oya/server`) and exposes the live plan: each node's status, the handles it
- * sealed (at their projection level — `OPAQUE` discloses nothing), and the
+ * sealed (at their projection level - `OPAQUE` discloses nothing), and the
  * answer as it streams. `useChat` is a message-list convenience on top.
  *
  * React is a peer dependency.
@@ -24,7 +24,7 @@ export interface NodeState {
 
 export interface PlanState {
   status: "idle" | "streaming" | "done" | "error";
-  /** The emitted plan (raw, as it arrived) — for drawing the DAG. */
+  /** The emitted plan (raw, as it arrived) - for drawing the DAG. */
   plan: unknown | null;
   nodes: NodeState[];
   text: string;

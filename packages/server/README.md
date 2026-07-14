@@ -1,6 +1,6 @@
 # oyadotai-server
 
-Fetch-API server helpers for [`oyadotai`](https://www.npmjs.com/package/oyadotai) agents — turn an agent's stream into a `Response` on any Fetch-based runtime (Bun, Next.js route handlers, Cloudflare Workers, the edge).
+Fetch-API server helpers for [`oyadotai`](https://www.npmjs.com/package/oyadotai) agents - turn an agent's stream into a `Response` on any Fetch-based runtime (Bun, Next.js route handlers, Cloudflare Workers, the edge).
 
 ```bash
 bun add oyadotai oyadotai-server

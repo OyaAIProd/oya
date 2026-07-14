@@ -1,5 +1,5 @@
 /**
- * `oyadotai-server` — turn an agent's event stream into a Fetch `Response` you can
+ * `oyadotai-server` - turn an agent's event stream into a Fetch `Response` you can
  * return from any server: a Next.js route handler, Bun.serve, or the edge.
  *
  *     import { toSSEResponse } from "oyadotai-server";

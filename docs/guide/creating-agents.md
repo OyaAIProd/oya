@@ -1,7 +1,7 @@
 # Creating an Agent
 
 An oya `Agent` has the same shape as Mastra: a model, a set of tools, and some
-instructions. What's different is underneath — the agent emits a typed plan once
+instructions. What's different is underneath - the agent emits a typed plan once
 and executes it, instead of looping the model on every tool call.
 
 ```ts
@@ -22,7 +22,7 @@ const { text } = await agent.generate("How's the weather in NYC?");
 ## Defining tools
 
 A tool is an `id`, a `description`, a zod `inputSchema`, and an `execute`
-function. Types flow from the schema — `execute`'s argument is inferred, no casts.
+function. Types flow from the schema - `execute`'s argument is inferred, no casts.
 
 ```ts
 const getWeather = createTool({
@@ -37,13 +37,13 @@ const getWeather = createTool({
 ```
 
 The `description` is what the planner reads when it decides whether and how to use
-the tool — write it for the model. The **return value is `OPAQUE` by default**: it
+the tool - write it for the model. The **return value is `OPAQUE` by default**: it
 flows to the next tool by reference and is never shown to the model. You annotate
 nothing to get this.
 
 ## Multiple tools that hand off
 
-The planner wires one tool's output into the next tool's input by name — the value
+The planner wires one tool's output into the next tool's input by name - the value
 never round-trips through the model. Give the agent the tools and describe the
 task; it composes them.
 
@@ -62,7 +62,7 @@ const agent = new Agent({
 await agent.generate("Get the NYC weather, then publish it as a PDF and a web page.");
 ```
 
-`get_weather`'s result reaches `generate_pdf` byte-for-byte — the model never
+`get_weather`'s result reaches `generate_pdf` byte-for-byte - the model never
 re-types it, so a URL, id, or payload can't drift.
 
 ## Choosing a model
@@ -80,7 +80,7 @@ openai("gpt-5-2025-08-07");
 google("gemini-3-pro");
 ```
 
-The model here is the **planner** — it emits the plan. It is called once per run
+The model here is the **planner** - it emits the plan. It is called once per run
 (plus a call per `extract` / `summarise` node), not once per tool. Set the API key
 via the provider's standard environment variable (e.g. `ANTHROPIC_API_KEY`).
 
@@ -92,7 +92,7 @@ via the provider's standard environment variable (e.g. `ANTHROPIC_API_KEY`).
 const { text } = await agent.generate("…");
 ```
 
-`stream(prompt)` returns structured events as the plan executes — ideal for a UI:
+`stream(prompt)` returns structured events as the plan executes - ideal for a UI:
 
 ```ts
 for await (const e of agent.stream("…").fullStream) {
@@ -111,8 +111,8 @@ same events [oya Studio](/guide/studio) renders live.
 
 ## Inspecting the plan
 
-`generate` and `stream` both expose the full planner result for observability —
-the plan that was emitted, the execution trace, and token usage — so you can log
+`generate` and `stream` both expose the full planner result for observability -
+the plan that was emitted, the execution trace, and token usage - so you can log
 or assert on exactly what ran.
 
 ```ts
@@ -123,6 +123,6 @@ console.log(res.usage.modelCalls);              // how many times the model was 
 
 ## Next
 
-- [Sandbox](/guide/sandbox) — control how and where a tool's `execute` runs.
-- [Projection Types](/concepts/projection-types) — the `OPAQUE` / `SUMMARY` /
+- [Sandbox](/guide/sandbox) - control how and where a tool's `execute` runs.
+- [Projection Types](/concepts/projection-types) - the `OPAQUE` / `SUMMARY` /
   `TRANSPARENT` discipline that keeps tool output away from the model.

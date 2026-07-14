@@ -6,26 +6,26 @@ document explains how decisions get made so contributors know what to expect.
 
 ## Roles
 
-- **Users** — anyone using `oyadotai`. Feedback, bug reports, and questions in
+- **Users** - anyone using `oyadotai`. Feedback, bug reports, and questions in
   [Discussions](https://github.com/OyaAIProd/oya/discussions) are contributions
   and are valued.
-- **Contributors** — anyone who opens a PR, files a well-scoped issue, improves
+- **Contributors** - anyone who opens a PR, files a well-scoped issue, improves
   docs, or helps others. You don't need permission to start; just follow
   [CONTRIBUTING.md](./CONTRIBUTING.md).
-- **Maintainers** — trusted contributors with merge rights. They triage issues,
+- **Maintainers** - trusted contributors with merge rights. They triage issues,
   review PRs, and safeguard the project's invariants (see below). Maintainers are
   currently the Oya Labs core team; we add community maintainers as trust is
   earned through sustained, high-quality contribution.
 
 ## How decisions are made
 
-- **Everyday changes** (bug fixes, providers, docs, tests) — a maintainer review
+- **Everyday changes** (bug fixes, providers, docs, tests) - a maintainer review
   and a green CI run are enough to merge.
 - **Notable changes** (public API, the Plan IR, projection semantics, new node
-  kinds) — open an issue or Discussion first. These need agreement from at least
+  kinds) - open an issue or Discussion first. These need agreement from at least
   one maintainer and a look from a second, because they affect everyone building
   on oya and, downstream, oya.ai.
-- **Disagreements** — we aim for lazy consensus: a proposal with no sustained
+- **Disagreements** - we aim for lazy consensus: a proposal with no sustained
   objection after reasonable time moves forward. When consensus can't be reached,
   the Oya Labs core team makes the final call, in the open, with reasoning.
 

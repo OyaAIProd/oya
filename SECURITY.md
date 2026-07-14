@@ -12,9 +12,9 @@ newest release before reporting.
 
 Report privately through either channel:
 
-- **GitHub** — [open a private advisory](https://github.com/OyaAIProd/oya/security/advisories/new)
+- **GitHub** - [open a private advisory](https://github.com/OyaAIProd/oya/security/advisories/new)
   (Security → Advisories → *Report a vulnerability*). Preferred.
-- **Email** — **mk@oya.ai** with steps to reproduce, affected versions, and
+- **Email** - **mk@oya.ai** with steps to reproduce, affected versions, and
   impact.
 
 We aim to acknowledge reports within **3 business days** and to ship a fix or a
@@ -26,7 +26,7 @@ oya's core security claim is the **projection lattice**: values marked `OPAQUE`
 must never reach the planner-facing view. We are especially interested in:
 
 - Any input that causes an `OPAQUE` value (or a sentinel planted in one) to appear
-  in the model-facing context — this is the headline invariant
+  in the model-facing context - this is the headline invariant
   (`packages/core/test/executor.test.ts`) and must never be weakened.
 - Static-checker bypasses (`packages/core/src/checker.ts`) that let a plan execute
   with a disclosure it didn't declare.

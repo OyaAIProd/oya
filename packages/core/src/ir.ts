@@ -1,7 +1,7 @@
 /**
  * The Plan IR data model.
  *
- * Ported from `oya_planner/ir.py` — a faithful encoding of spec/plan-ir.md §3, a
+ * Ported from `oya_planner/ir.py` - a faithful encoding of spec/plan-ir.md §3, a
  * typed dataflow DAG of named handles that a planner model can emit in one
  * structured-output call and the runtime can analyse and execute
  * deterministically.
@@ -39,7 +39,7 @@ function handleNames(inputs: Inputs): string[] {
   return values.filter((h): h is string => Boolean(h));
 }
 
-/** Drop null / empty entries — the graph and static checks only see real handles. */
+/** Drop null / empty entries - the graph and static checks only see real handles. */
 function present(handles: (string | null)[]): string[] {
   return handles.filter((h): h is string => Boolean(h));
 }
@@ -152,7 +152,7 @@ abstract class ParamNode extends NodeBase {
   inputs: Inputs;
   /**
    * Literal constant arguments keyed by parameter name (e.g.
-   * `{action: "create", file_path: "report.pdf"}`) — values the skill needs that
+   * `{action: "create", file_path: "report.pdf"}`) - values the skill needs that
    * no upstream node produces. They never become handles and are never disclosed
    * back to the planner.
    */

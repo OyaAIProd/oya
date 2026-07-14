@@ -1,4 +1,4 @@
-# demo.tape — records the paced "plan, don't react" terminal demo into demo.gif.
+# demo.tape - records the paced "plan, don't react" terminal demo into demo.gif.
 # Deterministic, no API key. Regenerate with:  vhs demo.tape
 #
 #   brew install vhs        # one-time (pulls ttyd + ffmpeg)

@@ -5,10 +5,10 @@
  * sandbox per invocation with capability-based egress (the egress policy lands
  * in a later phase). Two implementations:
  *
- *   - `InProcessSandbox` — the default. Runs the skill in-process with
+ *   - `InProcessSandbox` - the default. Runs the skill in-process with
  *     wall-clock accounting. Appropriate for trusted, first-party skills, where
- *     the projection lattice — not the sandbox — carries the security claim.
- *   - `WorkerSandbox` — runs a self-contained skill function in a worker thread,
+ *     the projection lattice - not the sandbox - carries the security claim.
+ *   - `WorkerSandbox` - runs a self-contained skill function in a worker thread,
  *     the seam where resource caps and egress policy attach for untrusted /
  *     synthesised skills.
  *
@@ -40,7 +40,7 @@ export class InProcessSandbox implements Sandbox {
  * Run a self-contained skill function in a worker thread.
  *
  * Like the Python `SubprocessSandbox` (spawn semantics), the skill's `fn` must be
- * self-contained — it is shipped to the worker by source and cannot close over
+ * self-contained - it is shipped to the worker by source and cannot close over
  * outer variables. This is the attachment point for resource caps and egress
  * restriction on untrusted skills.
  */

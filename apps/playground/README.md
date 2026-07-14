@@ -1,7 +1,7 @@
 # oya Studio (playground)
 
 A local agent console: pick an agent, chat with it, and watch its plan execute on
-the right — the live DAG, the event trace, and each node's I/O at its projection
+the right - the live DAG, the event trace, and each node's I/O at its projection
 level (`OPAQUE` shows nothing, `SUMMARY` the summary, `TRANSPARENT` the value).
 
 ```bash
@@ -11,7 +11,7 @@ make dev          # from the repo root → http://localhost:4000
 ## Registering an agent
 
 Agents live in [`lib/agents.ts`](./lib/agents.ts). Add an entry to the exported
-`agents` map — the key becomes a sidebar tab and is served at
+`agents` map - the key becomes a sidebar tab and is served at
 `POST /api/run { agent, prompt }`:
 
 ```ts
@@ -36,7 +36,7 @@ export const agents = {
 };
 ```
 
-That's it — no separate registration call. The sidebar reads `GET /api/agents`
+That's it - no separate registration call. The sidebar reads `GET /api/agents`
 (the keys of this map) and the chat streams `POST /api/run`.
 
 ## Model key

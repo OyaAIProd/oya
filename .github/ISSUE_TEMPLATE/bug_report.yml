@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         Thanks for filing a bug! Please search [existing issues](https://github.com/OyaAIProd/oya/issues) first.
-        For **security** problems, do **not** use this form — see [SECURITY.md](../blob/main/SECURITY.md).
+        For **security** problems, do **not** use this form - see [SECURITY.md](../blob/main/SECURITY.md).
   - type: textarea
     id: what-happened
     attributes:

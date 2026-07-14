@@ -1,4 +1,4 @@
-/** The Mastra runner — a token loop on the AI SDK. Loosely typed (Mastra generics). */
+/** The Mastra runner - a token loop on the AI SDK. Loosely typed (Mastra generics). */
 
 import { anthropic } from "@ai-sdk/anthropic";
 import { Agent } from "@mastra/core/agent";
