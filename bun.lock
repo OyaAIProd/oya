@@ -47,7 +47,7 @@
     },
     "packages/core": {
       "name": "oyadotai",
-      "version": "0.1.9",
+      "version": "0.1.10",
       "bin": {
         "oya": "./dist/cli.js",
       },
@@ -77,7 +77,7 @@
     },
     "packages/server": {
       "name": "oyadotai-server",
-      "version": "0.1.9",
+      "version": "0.1.10",
       "devDependencies": {
         "oyadotai": "workspace:*",
         "tsup": "^8.3.0",
