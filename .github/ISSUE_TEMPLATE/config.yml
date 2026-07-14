@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions & discussion
+    url: https://github.com/OyaAIProd/oya/discussions
+    about: Ask questions, share what you built, or propose an idea before a PR.
+  - name: 🔒 Report a security vulnerability
+    url: https://github.com/OyaAIProd/oya/security/advisories/new
+    about: Please report vulnerabilities privately — do not open a public issue.
+  - name: ☁️ oya.ai (hosted platform)
+    url: https://oya.ai
+    about: Questions about the hosted platform rather than the open-source library.

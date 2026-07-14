@@ -10,7 +10,9 @@ costs a fraction, and runs the same every time.**
 
 **Drop-in for Mastra.** TypeScript · Bun · MIT
 
-[Quickstart](#quickstart) · [The numbers](#the-numbers) · [Why](#why) · [Migrate from Mastra](#migrate-from-mastra-in-2-lines) · [Studio](#studio)
+[Quickstart](#quickstart) · [The numbers](#the-numbers) · [Why](#why) · [Migrate from Mastra](#migrate-from-mastra-in-2-lines) · [Studio](#studio) · [White paper](#white-paper)
+
+**The open-source core behind [oya.ai](https://oya.ai) — the hosted platform for plan-don't-react agents.**
 
 </div>
 
@@ -131,8 +133,16 @@ bunx oyadotai dev      # → oya Studio at localhost:4000
 oya is a **library, not a platform**. Run an agent in a script, a Next.js route, a
 Bun server, a worker, the edge — `await agent.generate(prompt)`. Stream it with
 `agent.stream(prompt)` (structured events, not a token soup) and render it with
-`oya/react`'s `usePlan` / `useChat`, or serve SSE with `oyadotai-server`. Managed
-hosting (Oya Cloud) is coming.
+`oya/react`'s `usePlan` / `useChat`, or serve SSE with `oyadotai-server`.
+
+## Built on this: [oya.ai](https://oya.ai)
+
+This package is the **open-source core** that [**oya.ai**](https://oya.ai) runs on —
+the same plan-once runtime, projection types, and Studio, now hosted. Want the
+managed platform (deploy agents, schedules, skills, and the Studio without running
+any infrastructure) instead of wiring it up yourself? Start at
+**[oya.ai](https://oya.ai)** — everything you build against this library is the same
+engine that powers it.
 
 ## Install
 
@@ -158,8 +168,21 @@ make bench      # the comparison
 make check      # typecheck + test, every package
 ```
 
+## Community & contributing
+
+oya is a community project — contributions of every size are welcome.
+
+- [Contributing guide](https://github.com/OyaAIProd/oya/blob/main/CONTRIBUTING.md) · [Good first issues](https://github.com/OyaAIProd/oya/labels/good%20first%20issue)
+- [Discussions](https://github.com/OyaAIProd/oya/discussions) · [Code of Conduct](https://github.com/OyaAIProd/oya/blob/main/CODE_OF_CONDUCT.md) · [Governance](https://github.com/OyaAIProd/oya/blob/main/GOVERNANCE.md)
+- Security issues: report privately per [SECURITY.md](https://github.com/OyaAIProd/oya/blob/main/SECURITY.md). Anything else: **mk@oya.ai**.
+
+## White paper
+
 oya is the TypeScript implementation of *Plan, Don't React: Projection Types for LLM
-Agent Runtimes*.
+Agent Runtimes*. Read the white paper:
+
+- [Plan, Don't React — the white paper](https://drive.google.com/file/d/1JLzaIU0DmOOomoumReSGRnMXdtAgySpv/view?usp=sharing)
+- [Companion paper](https://drive.google.com/file/d/1uYflhyJhQuZ5nU0rAfePpjYLcSS65uYU/view?usp=sharing)
 
 ## License
 

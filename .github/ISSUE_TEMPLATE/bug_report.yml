@@ -1,0 +1,65 @@
+name: 🐛 Bug report
+description: Something in oya behaves incorrectly.
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug! Please search [existing issues](https://github.com/OyaAIProd/oya/issues) first.
+        For **security** problems, do **not** use this form — see [SECURITY.md](../blob/main/SECURITY.md).
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug and what you expected instead.
+      placeholder: I called agent.generate(...) and got ...; I expected ...
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: The smallest code snippet or steps that reproduce it. A link to a repo/gist is ideal.
+      render: ts
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: oyadotai version
+      placeholder: e.g. 0.1.5 (run `bun pm ls | grep oyadotai`)
+    validations:
+      required: true
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Model provider
+      options:
+        - anthropic
+        - openai
+        - google
+        - other / not applicable
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: Runtime & OS
+      placeholder: e.g. Bun 1.1.38, macOS 15 / Node 20, Linux
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / stack trace
+      description: Paste any relevant output. This is automatically formatted as code.
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmations
+      options:
+        - label: I searched existing issues and this isn't a duplicate.
+          required: true
+        - label: I'm on the latest published version (or noted why not).
+          required: true
