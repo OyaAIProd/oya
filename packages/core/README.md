@@ -99,7 +99,11 @@ annotate none of this - it's `OPAQUE` by default.
 
 ## Migrate from Mastra in 2 lines
 
-`createTool` and `Agent` mirror `@mastra/core`. Change the imports; the code stays:
+If your app already uses `@mastra/core`, oya is close to a drop-in. `createTool`
+and `Agent` mirror the shapes you already write, so for most apps the entire
+migration is the import lines.
+
+**Step 1 - swap the imports:**
 
 ```diff
 - import { Agent } from "@mastra/core/agent";
@@ -109,10 +113,66 @@ annotate none of this - it's `OPAQUE` by default.
 + import { anthropic } from "oyadotai/anthropic";
 ```
 
-Same `createTool({ id, inputSchema, execute })` and
-`new Agent({ name, instructions, model, tools }).generate(prompt)` (returns
-`{ text }`). The difference is underneath: oya emits a checked plan and executes it
-instead of looping - so a migrated app gets the numbers above for free.
+**Step 2 - there is no step 2.** Your tool and agent definitions compile unchanged.
+
+### What stays identical
+
+| Mastra | oya | Notes |
+|---|---|---|
+| `createTool({ id, description, inputSchema, execute })` | **same** | Types are inferred from the zod `inputSchema`; `execute`'s argument is typed for you - no casts. |
+| `new Agent({ name, instructions, model, tools })` | **same** | `tools` is the same `name → tool` map. |
+| `await agent.generate(prompt)` → `{ text }` | **same** | `text` is the headline field, and token `usage` is reported for parity. |
+| `agent.stream(prompt)` | **same call** | Returns structured events (`fullStream` / `textStream`) instead of a raw token soup. |
+| `anthropic(…)` · `openai(…)` · `google(…)` | `oyadotai/anthropic` · `…/openai` · `…/google` | Same call shape, different import path. |
+
+So the code you already have keeps working as-is:
+
+```ts
+import { Agent, createTool } from "oyadotai";
+import { anthropic } from "oyadotai/anthropic";
+import { z } from "zod";
+
+const getWeather = createTool({
+  id: "get_weather",
+  description: "Look up the weather for a city",
+  inputSchema: z.object({ city: z.string() }),
+  execute: async ({ city }) => fetchWeather(city),
+});
+
+const agent = new Agent({
+  name: "WeatherBot",
+  instructions: "Answer weather questions.",
+  model: anthropic("claude-haiku-4-5-20251001"),
+  tools: { get_weather: getWeather },
+});
+
+const { text } = await agent.generate("How's the weather in NYC?");
+```
+
+### What changes underneath
+
+Same surface, different engine. Mastra runs a **token loop**: the model calls a
+tool, reads the raw result, and decides the next call - re-reading every value back
+through the model. oya has the model emit **one typed plan** and executes that DAG
+directly. Values flow between tools by reference and are disclosed to the model
+only at their declared projection level (`OPAQUE` by default).
+
+You didn't touch your code, but the migrated app now gets, for free:
+
+- **~½ the tokens of the leanest loop, 5× fewer than Mastra, ~3× faster** (the [numbers above](#the-numbers)) - intermediate state is piped tool-to-tool, never re-billed through the model.
+- **Deterministic execution** - one statically-checked order on every run, instead of a model-chosen sequence that can reorder or skip steps.
+- **Injection-safe by construction** - tool output the model never reads can't smuggle an injected instruction into its context.
+
+### Good to know before you migrate
+
+- **Projection defaults to `OPAQUE`.** Tool outputs are hidden from the model
+  unless you mark them `SUMMARY` or `TRANSPARENT`. That's the safety win - but if a
+  tool relied on the model *reading* its raw output to decide the next step, declare
+  that output's projection. See [Projection Types](https://github.com/OyaAIProd/oya/blob/main/docs/concepts/projection-types.md).
+- **Providers import from `oyadotai/*`** (`oyadotai/anthropic`, `oyadotai/openai`,
+  `oyadotai/google`) rather than `@ai-sdk/*`.
+- oya is pre-1.0 and mirrors the **core** of the Mastra surface, not every helper.
+  If something you depend on is missing, [open an issue](https://github.com/OyaAIProd/oya/issues) - Mastra parity gaps are high-priority.
 
 ## Studio
 
