@@ -21,7 +21,7 @@ If you pass no `sandbox`, the agent uses `InProcessSandbox`.
 
 Runs the tool in the same process and measures its wall-clock cost. This is the
 right choice for **trusted, first-party tools** - the ones you wrote. In oya the
-security claim is carried by the [projection lattice](/concepts/projection-types)
+security claim is carried by the [projection lattice](../concepts/projection-types.md)
 (the model never sees `OPAQUE` values), not by process isolation, so first-party
 tools don't need a heavier sandbox.
 
@@ -63,7 +63,7 @@ execute: async ({ id }) => {
 ```
 
 A tool that overruns its timeout is terminated and surfaces as a typed skill error,
-which the planner can [replan](/concepts/plan-ir) around.
+which the planner can [replan](../concepts/plan-ir.md) around.
 
 ## Writing your own
 

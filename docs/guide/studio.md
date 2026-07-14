@@ -39,4 +39,4 @@ step. It serves every agent your config exports.
 
 Studio consumes the same structured events as `agent.stream(prompt)`, so what you
 see in the UI is exactly what your app receives programmatically - see
-[Creating an Agent](/guide/creating-agents#generate-vs-stream).
+[Creating an Agent](./creating-agents.md#generate-vs-stream).

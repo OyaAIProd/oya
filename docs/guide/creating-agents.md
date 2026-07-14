@@ -107,7 +107,7 @@ for await (const e of agent.stream("…").fullStream) {
 ```
 
 Use `.textStream` if you only want the final answer's text deltas. These are the
-same events [oya Studio](/guide/studio) renders live.
+same events [oya Studio](./studio.md) renders live.
 
 ## Inspecting the plan
 
@@ -123,6 +123,6 @@ console.log(res.usage.modelCalls);              // how many times the model was 
 
 ## Next
 
-- [Sandbox](/guide/sandbox) - control how and where a tool's `execute` runs.
-- [Projection Types](/concepts/projection-types) - the `OPAQUE` / `SUMMARY` /
+- [Sandbox](./sandbox.md) - control how and where a tool's `execute` runs.
+- [Projection Types](../concepts/projection-types.md) - the `OPAQUE` / `SUMMARY` /
   `TRANSPARENT` discipline that keeps tool output away from the model.

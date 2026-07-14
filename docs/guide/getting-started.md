@@ -106,5 +106,5 @@ if (result.ok) {
 ```
 
 See the [runnable example](https://github.com/OyaAIProd/oya/tree/main/packages/core/examples) for
-the full SDR follow-up plan, and [Projection Types](/concepts/projection-types)
+the full SDR follow-up plan, and [Projection Types](../concepts/projection-types.md)
 for the discipline that makes it safe.

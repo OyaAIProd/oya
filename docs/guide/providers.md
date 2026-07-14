@@ -84,5 +84,5 @@ your tools, instructions, and the plan-once execution model are unchanged:
 
 The model only ever emits the plan; from there the runtime executes the DAG the
 same way regardless of which provider planned it. See
-[Projection Types](/concepts/projection-types) for what the model does and doesn't
+[Projection Types](../concepts/projection-types.md) for what the model does and doesn't
 get to see.
