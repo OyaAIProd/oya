@@ -49,9 +49,9 @@ make example     # the weather example, no network
 ## The correctness oracle
 
 The core runtime is a TypeScript port of the Python reference implementation
-[`oya-planner`](https://github.com/oya-labs). **The test suite under `test/`
-mirrors the reference's tests one-for-one** and is the source of truth for runtime
-behaviour. If you change the runtime:
+(`oya-planner`). **The test suite under `test/` mirrors the reference's tests
+one-for-one** and is the source of truth for runtime behaviour. If you change the
+runtime:
 
 - keep the mirrored tests green, and
 - when you fix a behavioural difference from the reference, add a test that pins

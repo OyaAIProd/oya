@@ -14,7 +14,7 @@ hero:
       link: /concepts/projection-types
     - theme: alt
       text: GitHub
-      link: https://github.com/oya-labs/oya
+      link: https://github.com/OyaAIProd/oya
 
 features:
   - title: OPAQUE by default

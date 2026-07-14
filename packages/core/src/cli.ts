@@ -9,8 +9,6 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { STUDIO_HTML } from "./studio-html.js";
-
 type Streamable = { stream: (p: string) => { fullStream: AsyncIterable<unknown> } };
 
 // The built Studio SPA (React Flow UI), emitted next to this file at dist/studio.
@@ -81,13 +79,18 @@ async function dev(argv: string[]) {
       const a = (agent && agents[agent]) || agents[names[0]];
       return sse(a.stream(prompt).fullStream);
     }
-    // Serve the built Studio SPA; fall back to the inline HTML if it isn't built.
+    // Serve the built Studio SPA (React Flow UI). It ships in the `oyadotai`
+    // package under dist/studio, so it's always present for installed users.
     const path = url.pathname === "/" || url.pathname.includes("..") ? "/index.html" : url.pathname;
     const asset = Bun.file(STUDIO_DIR + path);
     if (await asset.exists()) return new Response(asset);
     const index = Bun.file(STUDIO_DIR + "/index.html");
     if (await index.exists()) return new Response(index, { headers: { "content-type": "text/html; charset=utf-8" } });
-    return new Response(STUDIO_HTML, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
+    // Only reached when running from source without a build.
+    return new Response(
+      "oya Studio isn't built. Run `bun run build` (or `make build`) to emit dist/studio, then restart `oya dev`.",
+      { status: 503, headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" } },
+    );
   };
 
   for (let p = wanted; p < wanted + 10; p++) {

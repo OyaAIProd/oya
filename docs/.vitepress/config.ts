@@ -15,6 +15,7 @@ export default defineConfig({
         items: [
           { text: "Getting Started", link: "/guide/getting-started" },
           { text: "Creating an Agent", link: "/guide/creating-agents" },
+          { text: "Model Providers", link: "/guide/providers" },
           { text: "Configuring the Sandbox", link: "/guide/sandbox" },
           { text: "Studio", link: "/guide/studio" },
         ],

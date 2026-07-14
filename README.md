@@ -231,6 +231,7 @@ Full docs live in [`docs/`](./docs) (served locally with `make docs`):
 **Guide**
 - [Getting Started](./docs/guide/getting-started.md) — install and write your first agent
 - [Creating an Agent](./docs/guide/creating-agents.md) — tools, instructions, and the plan-once model
+- [Model Providers](./docs/guide/providers.md) — Anthropic, OpenAI, and Google, and swapping between them
 - [Configuring the Sandbox](./docs/guide/sandbox.md) — where and how each tool's `execute` runs
 - [Studio](./docs/guide/studio.md) — chat with your agents and watch the plan execute live
 
